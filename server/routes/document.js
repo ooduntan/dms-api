@@ -1,11 +1,14 @@
-var DocumentCtrl = require('../controllers/documents');
+(function() {
+  var express = require('express');
+  var router = express.Router();
+  var DocumentCtrl = require('../controllers/documentController');
 
-module.exports = function(api) {
-  api.post('/documents', DocumentCtrl.save);
-  api.get('/documents', DocumentCtrl.getAll);
-  api.get('/documents/:id', DocumentCtrl.findId);
-  api.post('/documents/find', DocumentCtrl.findTitle);
-  api.delete('/documents/:id', DocumentCtrl.delete);
-  api.put('/documents/:id', DocumentCtrl.update);
-  return api;
-};
+  router.post('/documents', DocumentCtrl.createDoc);
+  router.get('/documents', DocumentCtrl.getDoc);
+  // router.get('/documents/:id', DocumentCtrl.findId);
+  // router.post('/documents/find', DocumentCtrl.findTitle);
+  // router.delete('/documents/:id', DocumentCtrl.delete);
+  // router.put('/documents/:id', DocumentCtrl.update);
+  module.exports = router;
+
+})();

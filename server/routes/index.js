@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 router.use('/api', require('./user'));
+router.use('/api', require('./document'));
 
 
 router.get('/', function(req, res) {

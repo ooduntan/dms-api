@@ -1,88 +1,97 @@
-var Users = require('../models/userModel');
-var mongoose = require('mongoose');
+(function() {
+  'use strict';
 
-var validateUsersData = {
+  var helper = require('./controllerHelper');
+  var userService = require('../service/userService');
+  var auth = require('../middleware/auth');
 
-  signUpData: ['firstname', 'lastname', 'email', 'username', 'password', 'role'],
-
-  loginData: ['username', 'password'],
-
-  validateData: function(requiredData, data) {
-    for (var index = 0; index < requiredData.length; index++) {
-      var element = requiredData[index];
-      if (data[element] === undefined || this.verifyContent(data[element])) {
-        return false;
-      }
-    }
-    //console.log('i got here');
-    return this.verifyEmail(data.email);
-  },
-
-  verifyContent: function(string) {
-    return /[^@\w.-]/.test(string.trim());
-  },
-
-  verifyEmail: function(email) {
-    return /\S+@\S+\./g.test(email);
-  },
-  formatAndSaveData: function(userData, cb) {
-    if (this.validateData(this.signUpData, userData)) {
-      return this.saveUserData(this.formatUserData(userData), cb);
-    } else {
-      return false;
-    }
-  },
-
-  saveUserData: function(userDataObject, cb) {
-    Users.saveUser(userDataObject, cb);
-  },
-  getUsers: function(id, cb) {
-    Users.findUsers(id, cb);
-  },
-  formatUserData: function(userObject) {
-    return {
-      name: {
-        firstname: userObject.firstname,
-        lastname: userObject.lastname
-      },
-      email: userObject.email,
-      username: userObject.username,
-      role: userObject.role,
-      password: userObject.password
-    };
-  }
-
-};
-
-module.exports = {
-  signup: function(req, res) {
-    validateUsersData.formatAndSaveData(req.body, function(saveData, error) {
-      if (saveData) {
-        res.json({
-          success: true,
-          message: 'User ' + req.body.username + ' created!'
-        });
+  module.exports = {
+    signUp: function(req, res) {
+      helper.formatAndSaveData(req.body, function(dataSaved, error) {
+        if (dataSaved) {
+          res.json({
+            success: true,
+            message: 'User ' + req.body.username + ' created!'
+          });
+        } else {
+          res.status(500).send({
+            success: false,
+            message: error
+          });
+        }
+        console.log(helper.formatedData);
+      });
+    },
+    authenticateUser: function(req, res, next) {
+      var token = req.body.token || req.query.token || req.headers.token;
+      if (token) {
+        auth.verifyToken(req, res, next, token);
       } else {
-        res.status(500).send({
+        return res.status(403).send({
           success: false,
-          message: 'There was an error processing you request. ' +
-            'Please go thorugh the api documemntation and make sure' +
-            ' you are sending the correct data.'
+          message: 'Access denied. Provide your username and password.'
         });
-        console.log(error);
+
       }
-    });
-  },
-  getAllUsers: function(req, res) {
-    validateUsersData.getUsers(false, function(result, userData) {
-      if (result) {
-        res.json({ users: userData });
-      } else {
-        res.json({
-          message: 'An error occurued while getting the list of users',
-          error: userData
+    },
+    login: function(req, res) {
+      var userInfo = { username: req.body.username };
+      userService.getUsers(userInfo, function(result, message) {
+        if (result) {
+          res.json({
+            message: 'Welcome ' + message.name.lastname +
+              ' ' + message.name.firstname,
+            error: result,
+            token: auth.createToken(message._doc)
+          });
+        } else {
+          res.json({
+            message: 'User ' + req.body.username + ' does not exisit',
+            error: message
+          });
+        }
+      });
+    },
+    editUser: function(req, res) {
+      if (helper.validateData(helper.userRequirement, req.body, false)) {
+        userService.updateUserData(helper.formatedData, req.params.id, function(result, message) {
+          res.json({
+            message: result,
+            error: message
+          });
         });
       }
-    });
-  }
-};
+    },
+    deleteUser: function(req, res) {
+      userService.deleteOneUser(req.params.id, function(result, message) {
+        res.json({ users: message });
+      });
+    },
+    getOneUsers: function(req, res) {
+      var id = req.params.username;
+      userService.getUsers({ _id: id }, function(result, userData) {
+        if (result) {
+          res.json({ users: userData });
+        } else {
+          res.json({
+            message: 'User does not exisit',
+            error: userData
+          });
+        }
+      });
+    },
+    getAllUsers: function(req, res) {
+      userService.getUsers({}, function(result, userData) {
+        if (result) {
+          res.json({ users: userData });
+        } else {
+          res.json({
+            message: 'User does not exisit',
+            error: userData
+          });
+        }
+      });
+    }
+  };
+
+})();
