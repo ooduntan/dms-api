@@ -4,108 +4,90 @@
   var helper = require('./controllerHelper');
   var docModel = require('../models/documentModel');
 
-  function saveDoc(res, title) {
-    docModel.saveDoc(helper.formatedData, function(bool, message) {
-      if (bool) {
-        res.json({
-          success: bool,
-          message: title + ' created!'
-        });
-      } else {
-        res.status(500).send({
-          success: bool,
-          message: message
-        });
-      }
+  function saveDoc(res, docData) {
+    docModel.saveDoc(docData, function(bool, message) {
+      var result = { success: docData.title + ' created!', failed: message };
+      helper.messageResponder(res, bool, result, 401);
     });
   }
 
   function removeDoc(id, res) {
-    docModel.deleteDocById({ _id: id }, function(message, bool) {
-      if (bool) {
-        res.json({ result: message, bool: bool });
-      } else {
-        res.json({
-          result: bool,
-          error: message
-        });
-      }
+    docModel.findAndRemove({ _id: id }, function(bool, message) {
+      helper.dataResponder(res, bool, message, 'doc', 401);
+    });
+  }
+
+  function findUserDoc(id, res) {
+    docModel.getDoc({ creator: id }, function(bool, message) {
+      helper.dataResponder(res, bool, message, 'doc', 401);
+    });
+  }
+
+  function searchDoc(query, res) {
+    docModel.getDoc(query, function(bool, message) {
+      helper.dataResponder(res, bool, message, 'doc', 401);
     });
   }
 
   function updateDocCollections(docInfo, res, ownerId) {
     docModel.updateADoc(docInfo, ownerId, function(bool, data) {
-      if (bool) {
-        res.json({
-          result: bool,
-          error: data
-        });
-      } else {
-        res.json({
-          result: bool,
-          message: data
-        });
-      }
+      helper.dataResponder(res, bool, data, 'doc', 400);
     });
   }
 
   module.exports = {
     createDoc: function(req, res) {
-      if (helper.formatDocData(req.body, docData.decoded.user._id, true)) {
-        saveDoc(res, req.body.title);
+      var formatedData = helper.formatDocData(req.body, req.decoded.user._id, true);
+      if (formatedData.bool.value) {
+        saveDoc(res, formatedData.data);
       } else {
-        res.status(500).send({
-          success: false,
-          message: 'compulsory fields Missing'
-        });
+        var message = { failed: 'compulsory fields Missing' };
+        helper.messageResponder(res, false, message, 400);
       }
     },
     findDocId: function(req, res) {
       docModel.getDoc({ _id: req.params.id }, function(bool, documents) {
         if (bool) {
-          res.json({ user: documents });
+          helper.dataResponder(res, bool, documents, 'user', 204);
         } else {
-          res.json({
-            message: 'User does not exist',
-            error: docData
-          });
+          var message = { failed: 'Document does not exist' };
+          helper.messageResponder(res, false, message, 400);
         }
       });
     },
     getAllDoc: function(req, res) {
-      docModel.getDoc({}, function(result, docData) {
-        if (result) {
-          res.json({ users: docData });
-        } else {
-          res.json({
-            message: 'An error occurued while getting the list of users',
-            error: docData
-          });
-        }
+      docModel.getDoc({}, function(bool, docData) {
+        helper.dataResponder(res, bool, docData, 'user', 204);
       });
     },
     updateDoc: function(req, res) {
       if (helper.validateData(helper.docRequirement, req.body, false)) {
         updateDocCollections(req.body, res, req.params.id);
       } else {
-        res.json({
-          result: false,
-          error: 'Invalid data!!!'
-        });
+        var message = { failed: 'Invalid data!!!' };
+        helper.messageResponder(res, false, message, 400);
       }
     },
-    findUserDoc: function(req, res) {
-
+    findDocByUser: function(req, res) {
+      if (req.params.id.isNumber()) {
+        findUserDoc(req.params.id, res);
+      } else {
+        var message = { failed: 'Invalid user id' };
+        helper.messageResponder(res, false, message, 400);
+      }
     },
     deleteDoc: function(req, res) {
       if (req.params.id.isNumber()) {
         removeDoc(req.params.id, res);
       } else {
-        res.json({
-          message: 'Invalid user id',
-          error: true
-        });
+        var message = { failed: 'Invalid user id' };
+        helper.messageResponder(res, false, message, 400);
       }
+    },
+    findDoc: function(req, res) {
+      var searchExp = new RegExp(req.params.query, 'i');
+      var query = { $or: [{ 'title': searchExp }, { 'content': searchExp }] };
+      searchDoc(query, res);
     }
   };
 

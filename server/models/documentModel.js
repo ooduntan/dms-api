@@ -52,18 +52,28 @@ module.exports = {
   },
   deleteDocById: function(docId, cb) {
     docCollections.remove({ _id: docId }, function(err) {
-      return err ? cb(err, false) : cb('', true);
+      return err ? cb(false, err) : cb(true, err);
     });
   },
   updateADoc: function(docInfo, id, cb) {
-    docInfo.updated_at = Date.now();
     var query = { _id: id };
     var field = { $set: docInfo };
     var option = { new: true };
-    console.log(query);
-    console.log(field);
+
+    docInfo.updated_at = Date.now();
     docCollections.findOneAndUpdate(query, field, option, function(err, user) {
       return err ? cb(false, err) : cb(true, user);
+    });
+  },
+  findAndRemove: function(searchTerm, cb) {
+    var _this = this;
+    docCollections.find(searchTerm, function(err, docs) {
+      if (docs.length <= 0) {
+        return cb(false, 'Not found');
+      } else {
+        console.log(docs);
+        _this.deleteDocById({ _id: docs[0]._id }, cb);
+      }
     });
   }
 };

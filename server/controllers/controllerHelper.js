@@ -7,7 +7,7 @@ module.exports = {
   userRequirement: ['firstname', 'lastname'],
   loginData: ['username', 'password'],
   docRequirement: ['title'],
-  formatedData: {},
+  formatedData: { data: {}, bool: { value: false } },
   nameObject: {},
   validateData: function(requiredData, data, allField) {
     var objectArray = Object.keys(data);
@@ -26,17 +26,15 @@ module.exports = {
   },
   formatUserData: function(key, value) {
     if (key === 'email' && value.verifyEmail()) {
-      this.formatedData.email = value;
+      this.formatedData.data.email = value;
       return true;
     } else if ((key === 'firstname' || key === 'lastname') && value.isValidWord()) {
       this.nameObject[key] = value;
       return true;
-    } else if (value.isValidWord()) {
-      this.formatedData[key] = value;
+    } else {
+      this.formatedData.data[key] = value;
       return true;
     }
-
-    return false;
   },
   requiredLength: function(dataChecker, requiredData, allField) {
     if (allField) {
@@ -46,7 +44,7 @@ module.exports = {
   },
   mergeNameObj: function() {
     if (Object.keys(this.nameObject).length > 0) {
-      this.formatedData.name = this.nameObject;
+      this.formatedData.data.name = this.nameObject;
     }
     this.nameObject = {};
   },
@@ -58,29 +56,41 @@ module.exports = {
   },
   formatAndSaveData: function(userData, cb) {
     if (this.validateData(this.userRequirement, userData, true)) {
-      return userService.saveUserData(this.formatedData, cb);
+      return userService.saveUserData(this.formatedData.data, cb);
     } else {
       cb(false, 'I got an Invalid data set');
     }
   },
   formatDocData: function(docData, ownerId, allfields) {
     if (this.validateData(this.docRequirement, docData, allfields)) {
-      this.formatedData.creator = ownerId;
-      return true;
-    } else {
-      return false;
+      this.formatedData.data.creator = ownerId;
+      this.formatedData.bool.value = true;
+      return this.formatedData;
     }
+    return this.formatedData;
   },
-  responder: function(res, bool, result, httpCode) {
+  messageResponder: function(res, bool, result, httpCode) {
     if (bool) {
       res.json({
         success: bool,
-        message: title + ' ' + result.success
+        message: result.success
       });
     } else {
       res.status(httpCode).send({
         success: bool,
         message: result.failed
+      });
+    }
+  },
+  dataResponder: function(res, bool, result, resultName, httpCode) {
+    if (bool) {
+      var response = {};
+      response[resultName] = result;
+      res.json(response);
+    } else {
+      res.status(httpCode).send({
+        success: bool,
+        message: result
       });
     }
   }
