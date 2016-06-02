@@ -38,6 +38,7 @@
       var userInfo = { username: req.body.username };
       userService.getUsers(userInfo, function(result, message) {
         if (result) {
+          message = message[0];
           res.json({
             message: 'Welcome ' + message.name.lastname +
               ' ' + message.name.firstname,
@@ -68,7 +69,7 @@
       });
     },
     getOneUsers: function(req, res) {
-      var id = req.params.username;
+      var id = req.params.id;
       userService.getUsers({ _id: id }, function(result, userData) {
         if (result) {
           res.json({ users: userData });

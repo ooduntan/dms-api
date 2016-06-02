@@ -12,5 +12,5 @@ module.exports = {
   },
   deleteOneUser: function(userId, cb) {
     users.deleteUserById(userId, cb);
-  }
+  },
 };

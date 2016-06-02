@@ -18,6 +18,7 @@ var documentSchema = new modelAsset.schema({
   title: {
     type: String,
     trim: true,
+    unique: true,
     required: true
   },
   content: {
@@ -44,20 +45,23 @@ module.exports = {
       return err ? cb(false, err) : cb(true, err);
     });
   },
-  findUsers: function(searchTerm, cb) {
-    docCollections.find(searchTerm, function(err, user) {
-      return err ? cb(false, err) : cb(true, user);
+  getDoc: function(searchTerm, cb) {
+    docCollections.find(searchTerm, function(err, docs) {
+      return err ? cb(false, err) : cb(true, docs);
     });
   },
-  deleteUserById: function(userId, cb) {
-    docCollections.remove({ _id: userId }, function(err) {
+  deleteDocById: function(docId, cb) {
+    docCollections.remove({ _id: docId }, function(err) {
       return err ? cb(err, false) : cb('', true);
     });
   },
-  updateOneUser: function(userInfo, id, cb) {
+  updateADoc: function(docInfo, id, cb) {
+    docInfo.updated_at = Date.now();
     var query = { _id: id };
-    var field = { $set: userInfo };
+    var field = { $set: docInfo };
     var option = { new: true };
+    console.log(query);
+    console.log(field);
     docCollections.findOneAndUpdate(query, field, option, function(err, user) {
       return err ? cb(false, err) : cb(true, user);
     });

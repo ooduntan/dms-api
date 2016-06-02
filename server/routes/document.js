@@ -4,11 +4,12 @@
   var DocumentCtrl = require('../controllers/documentController');
 
   router.post('/documents', DocumentCtrl.createDoc);
-  router.get('/documents', DocumentCtrl.getDoc);
-  // router.get('/documents/:id', DocumentCtrl.findId);
+  router.get('/documents', DocumentCtrl.getAllDoc);
+  router.get('/documents/:id', DocumentCtrl.findDocId);
   // router.post('/documents/find', DocumentCtrl.findTitle);
-  // router.delete('/documents/:id', DocumentCtrl.delete);
-  // router.put('/documents/:id', DocumentCtrl.update);
+  router.delete('/documents/:id', DocumentCtrl.deleteDoc);
+  router.put('/documents/:id', DocumentCtrl.updateDoc);
+  router.put('/users/:id/documents', DocumentCtrl.findUserDoc);
   module.exports = router;
 
 })();

@@ -63,11 +63,25 @@ module.exports = {
       cb(false, 'I got an Invalid data set');
     }
   },
-  formatAndSaveDoc: function(docData, cb) {
-    if (this.validateData(this.docRequirement, docData, true)) {
-      return docService.saveDoc(this.formatedData, cb);
+  formatDocData: function(docData, ownerId, allfields) {
+    if (this.validateData(this.docRequirement, docData, allfields)) {
+      this.formatedData.creator = ownerId;
+      return true;
     } else {
-      cb(false, 'I got');
+      return false;
+    }
+  },
+  responder: function(res, bool, result, httpCode) {
+    if (bool) {
+      res.json({
+        success: bool,
+        message: title + ' ' + result.success
+      });
+    } else {
+      res.status(httpCode).send({
+        success: bool,
+        message: result.failed
+      });
     }
   }
 
