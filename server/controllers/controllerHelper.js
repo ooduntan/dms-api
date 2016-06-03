@@ -7,6 +7,7 @@ module.exports = {
   userRequirement: ['firstname', 'lastname'],
   loginData: ['username', 'password'],
   docRequirement: ['title'],
+  roleRequirement: ['role'],
   formatedData: { data: {}, bool: { value: false } },
   nameObject: {},
   validateData: function(requiredData, data, allField) {
@@ -64,6 +65,14 @@ module.exports = {
   formatDocData: function(docData, ownerId, allfields) {
     if (this.validateData(this.docRequirement, docData, allfields)) {
       this.formatedData.data.creator = ownerId;
+      this.formatedData.bool.value = true;
+      return this.formatedData;
+    }
+    return this.formatedData;
+  },
+  formatRoleData: function(roleData) {
+    if (roleData.role !== undefined && roleData.role.isSentence()) {
+      this.formatedData.data.role = roleData;
       this.formatedData.bool.value = true;
       return this.formatedData;
     }

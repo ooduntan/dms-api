@@ -3,6 +3,7 @@ var router = express.Router();
 
 router.use('/api', require('./user'));
 router.use('/api', require('./document'));
+router.use('/api', require('./userRoles'));
 
 
 router.get('/', function(req, res) {

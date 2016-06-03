@@ -1,10 +1,11 @@
-var UserRolesCtrl = require('../controllers/userRoles');
+var role = require('../controllers/rolesController');
+var express = require('express');
+var router = express.Router();
 
-module.exports = function(api) {
-  api.post('/user-role', UserRolesCtrl.create);
-  api.get('/user-role', UserRolesCtrl.getAllRoles);
-  api.get('/user-role/:role', UserRolesCtrl.getUserRole);
-  api.delete('/user-role/:role', UserRolesCtrl.removeRole);
-  api.put('/user-role/:role', UserRolesCtrl.update);
-  return api;
-};
+router.post('/role', role.createRole);
+router.get('/role', role.getAllrole);
+router.put('/role/:id', role.editRole);
+router.delete('/role/:id', role.deleteRole);
+router.get('/role/:id', role.getOneRole);
+
+module.exports = router;
