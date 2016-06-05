@@ -48,7 +48,7 @@
     findDocId: function(req, res) {
       docModel.getDoc({ _id: req.params.id }, function(bool, documents) {
         if (bool) {
-          helper.dataResponder(res, bool, documents, 'user', 204);
+          helper.dataResponder(res, bool, documents, 'doc', 204);
         } else {
           var message = { failed: 'Document does not exist' };
           helper.messageResponder(res, false, message, 400);
@@ -57,7 +57,7 @@
     },
     getAllDoc: function(req, res) {
       docModel.getDoc({}, function(bool, docData) {
-        helper.dataResponder(res, bool, docData, 'user', 204);
+        helper.dataResponder(res, bool, docData, 'doc', 204);
       });
     },
     updateDoc: function(req, res) {
@@ -80,7 +80,7 @@
       if (req.params.id.isNumber()) {
         removeDoc(req.params.id, res);
       } else {
-        var message = { failed: 'Invalid user id' };
+        var message = { failed: 'Invalid document id' };
         helper.messageResponder(res, false, message, 400);
       }
     },
