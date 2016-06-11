@@ -2,11 +2,11 @@
   'use strict';
   var jwt = require('jsonwebtoken');
   var config = require('../../config');
-  var userModel = require('../models/userModel');
+  var userService = require('../service/userService');
   var helper = require('../controllers/controllerHelper');
 
   module.exports = {
-    verifyToken: function(req, res, next, token) {
+    verifyToken: function(req, res, token, next) {
       var _this = this;
       jwt.verify(token, config.secret, function(err, decoded) {
         if (err) {
@@ -14,12 +14,13 @@
           helper.messageResponder(res, false, message, 403);
         } else {
           var query = { _id: decoded.user._id };
-          userModel.findUsers(query, function(bool, userData) {
+          userService.findUsers(query, function(bool, userData) {
             _this.checkUsers(userData, res, req, decoded, next);
           });
         }
       });
     },
+
     checkUsers: function(userData, res, req, decoded, next) {
       if (userData.length > 0) {
         req.decoded = decoded;

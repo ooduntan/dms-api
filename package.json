@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/andela-ooduntan/document-management-system#readme",
   "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.15.1",
     "co": "^4.6.0",
     "co-prompt": "^1.0.0",

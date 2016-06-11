@@ -1,6 +1,8 @@
 (function() {
   'use strict';
   var modelAsset = require('./modelPrerequisite');
+  var bcrypt = require('bcrypt-nodejs');
+
   modelAsset.initIncrement();
 
   var UserSchema = new modelAsset.schema({
@@ -39,32 +41,22 @@
     model: 'users',
     startAt: 1
   });
-  var UserCollection = modelAsset.model('users', UserSchema);
 
-  module.exports = {
-    saveUser: function(userData, cb) {
-      var user = new UserCollection(userData);
-      user.save(function(err) {
-        return err ? cb(false, err) : cb(true, err);
-      });
-    },
-    findUsers: function(searchTerm, cb) {
-      UserCollection.find(searchTerm, function(err, user) {
-        return err ? cb(false, err) : cb(true, user);
-      });
-    },
-    deleteUserById: function(userId, cb) {
-      UserCollection.remove({ _id: userId }, function(err) {
-        return err ? cb(err, false) : cb('', true);
-      });
-    },
-    updateOneUser: function(userInfo, id, cb) {
-      var query = { _id: id };
-      var field = { $set: userInfo };
-      var option = { new: true };
-      UserCollection.findOneAndUpdate(query, field, option, function(err, user) {
-        return err ? cb(false, err) : cb(true, user);
-      });
+  UserSchema.pre('save', function(next) {
+    var _this = this;
+    if (!_this.isModified('password')) {
+      next();
     }
-  };
+
+    bcrypt.hash(_this.password, null, null, function(err, hash) {
+      if (err) {
+        next(hashedPass);
+      } else {
+        _this.password = hash;
+        next();
+      }
+    });
+  });
+
+  module.exports = modelAsset.model('users', UserSchema);
 })();

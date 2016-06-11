@@ -3,7 +3,7 @@
   String.prototype.verifyEmail = function() {
     return /\S+@\S+\.\S+/g.test(this);
   };
-  String.prototype.isValidWord = function() {
+  String.prototype.isValidName = function() {
     return !/[^\w -]/.test(this.trim());
   };
   String.prototype.isNumber = function() {
