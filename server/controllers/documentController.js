@@ -42,20 +42,22 @@
       }
     },
     findDocByUser: function(req, res) {
-      if (req.params.id.isNumber()) {
-        docHelper.findUserDoc(req.params.id, res);
-      } else {
-        var message = { failed: 'Invalid user id' };
-        helper.messageResponder(res, false, message, 400);
-      }
+      docHelper.helperWithAction(req, res, 'findUserDoc', 'user');
+      // if (req.params.id.isNumber()) {
+      //   docHelper.findUserDoc(req.params.id, res);
+      // } else {
+      //   var message = { failed: 'Invalid user id' };
+      //   helper.messageResponder(res, false, message, 400);
+      // }
     },
     deleteDoc: function(req, res) {
-      if (req.params.id.isNumber()) {
-        docHelper.removeDoc(req.params.id, res);
-      } else {
-        var message = { failed: 'Invalid document id' };
-        helper.messageResponder(res, false, message, 400);
-      }
+      docHelper.helperWithAction(req, res, 'removeDoc', 'document');
+      // if (req.params.id.isNumber()) {
+      //   docHelper.removeDoc(req.params.id, res);
+      // } else {
+      //   var message = { failed: 'Invalid document id' };
+      //   helper.messageResponder(res, false, message, 400);
+      // }
     },
     findDoc: function(req, res) {
       var searchExp = new RegExp(req.params.query, 'i');
