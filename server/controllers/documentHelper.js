@@ -27,6 +27,11 @@
         helper.dataResponder(res, bool, message, 'doc', 401);
       });
     },
+    searchWithqquery: function(query, res) {
+      docService.getDoc(query, function(bool, message) {
+        helper.dataResponder(res, bool, message, 'doc', 401);
+      });
+    },
     updateDocCollections: function(docInfo, res, ownerId) {
       docService.updateADoc(docInfo, ownerId, function(bool, data) {
         helper.dataResponder(res, bool, data, 'doc', 400);

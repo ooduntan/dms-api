@@ -28,9 +28,15 @@
       });
     },
     getAllDoc: function(req, res) {
-      docService.getDoc({}, function(bool, docData) {
-        helper.dataResponder(res, bool, docData, 'doc', 204);
-      });
+      if (Object.keys(req.query).length > 0) {
+        docService.searchDoc(req.query, function(bool, docData) {
+          helper.dataResponder(res, bool, docData, 'doc', 204);
+        });
+      } else {
+        docService.getDoc({}, function(bool, docData) {
+          helper.dataResponder(res, bool, docData, 'doc', 204);
+        });
+      }
     },
     updateDoc: function(req, res) {
       var validatedData = helper.validateDocData(req.body, false);
