@@ -36,6 +36,14 @@
       docService.updateADoc(docInfo, ownerId, function(bool, data) {
         helper.dataResponder(res, bool, data, 'doc', 400);
       });
+    },
+    helperWithAction: function(request, response, action, reply) {
+      if (request.params.id.isNumber()) {
+        this[action](request.params.id, response);
+      } else {
+        var message = { failed: 'Invalid ' + reply + ' id' };
+        this.messageResponder(response, false, message, 400);
+      }
     }
   };
 }());
