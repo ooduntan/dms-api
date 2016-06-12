@@ -1,10 +1,10 @@
 (function() {
   'use strict';
 
-  var helper = require('./controllerHelper');
-  var auth = require('../middleware/auth');
-  var userService = require('../service/userService');
-  var userHelper = require('./userControllerHelper');
+  var helper = require('./controllerHelper'),
+    auth = require('../middleware/auth'),
+    userService = require('../service/userService'),
+    userHelper = require('./userControllerHelper');
 
   module.exports = {
     signUp: function(req, res) {

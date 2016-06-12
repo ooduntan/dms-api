@@ -1,9 +1,8 @@
 (function() {
   'use strict';
-  var userService = require('../service/userService');
-  var docService = require('../service/docService');
-  var encrypt = require('../middleware/security');
-  require('./stringClass');
+  var userService = require('../service/userService'),
+    docService = require('../service/docService'),
+    encrypt = require('../middleware/security');
 
   module.exports = {
     userRequirement: {

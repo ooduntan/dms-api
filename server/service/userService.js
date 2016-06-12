@@ -1,7 +1,7 @@
 (function() {
   'use strict';
-  var users = require('../models/userModel');
-  var bcrypt = require('../middleware/security');
+  var users = require('../models/userModel'),
+    bcrypt = require('../middleware/security');
 
   module.exports = {
     saveUser: function(userData, cb) {
