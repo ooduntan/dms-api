@@ -14,4 +14,4 @@
   //router.get('/users/logout', UserCtrl.logout);
 
   module.exports = router;
-})();
+}());

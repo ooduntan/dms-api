@@ -13,4 +13,4 @@
   router.get('/users/:id/documents', DocumentCtrl.findDocByUser);
   module.exports = router;
 
-})();
+}());

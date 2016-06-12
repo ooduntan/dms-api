@@ -42,4 +42,4 @@
 
   module.exports = modelAsset.model('documents', documentSchema);
 
-})();
+}());

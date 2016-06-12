@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 (function() {
   'use strict';
 
@@ -16,7 +14,6 @@
       console.log('Error connecting to the database');
     } else {
       console.log('Connected to the database...');
-      //require('./app/command-interface/command');
     }
   });
   // use morgan to log requests to the console
@@ -33,4 +30,4 @@
       console.log('DMS is running');
     }
   });
-})();
+}());

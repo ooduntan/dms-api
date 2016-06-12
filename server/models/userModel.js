@@ -59,4 +59,4 @@
   });
 
   module.exports = modelAsset.model('users', UserSchema);
-})();
+}());
