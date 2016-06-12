@@ -40,12 +40,7 @@
     },
     getOneRole: function(req, res) {
       roleService.getRoles({ _id: req.params.id }, function(bool, role) {
-        if (bool) {
-          helper.dataResponder(res, bool, role, 'role', 204);
-        } else {
-          var message = { failed: 'Document does not exist' };
-          helper.messageResponder(res, false, message, 400);
-        }
+        helper.searchResponse(res, bool, role, 'role');
       });
     }
   };
