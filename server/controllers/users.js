@@ -2,95 +2,71 @@
   'use strict';
 
   var helper = require('./controllerHelper');
-  var userService = require('../service/userService');
   var auth = require('../middleware/auth');
+  var userService = require('../service/userService');
+  var userHelper = require('./userControllerHelper');
 
   module.exports = {
     signUp: function(req, res) {
-      helper.formatAndSaveData(req.body, function(dataSaved, error) {
-        if (dataSaved) {
-          res.json({
-            success: true,
-            message: 'User ' + req.body.username + ' created!'
-          });
-        } else {
-          res.status(500).send({
-            success: false,
-            message: error
-          });
-        }
-        console.log(helper.formatedData);
-      });
+      var formatedUserObject = helper.validatAndFormatData(req.body, true);
+      if (formatedUserObject.bool.value) {
+        userHelper.saveUser(res, formatedUserObject.data);
+      } else {
+        var message = { failed: 'compulsory fields Missing' };
+        helper.messageResponder(res, false, message, 400);
+      }
     },
     authenticateUser: function(req, res, next) {
       var token = req.body.token || req.query.token || req.headers.token;
       if (token) {
-        auth.verifyToken(req, res, next, token);
+        auth.verifyToken(req, res, token, next);
       } else {
-        return res.status(403).send({
-          success: false,
-          message: 'Access denied. Provide your username and password.'
-        });
-
+        var result = { failed: 'Access denied.' };
+        helper.messageResponder(res, false, result, 403);
       }
     },
     login: function(req, res) {
-      var userInfo = { username: req.body.username };
-      userService.getUsers(userInfo, function(result, message) {
-        if (result) {
-          message = message[0];
-          res.json({
-            message: 'Welcome ' + message.name.lastname +
-              ' ' + message.name.firstname,
-            error: result,
-            token: auth.createToken(message._doc)
-          });
-        } else {
-          res.json({
-            message: 'User ' + req.body.username + ' does not exisit',
-            error: message
-          });
-        }
-      });
+      var userData = {};
+      if (req.body.username !== undefined && req.body.password !== undefined) {
+        userData.username = req.body.username;
+        userData.password = req.body.password;
+        userHelper.validateAndCheckUser(res, userData);
+      } else {
+        var result = { failed: 'Invalid User Data.' };
+        helper.messageResponder(res, false, result, 400);
+      }
     },
     editUser: function(req, res) {
-      if (helper.validateData(helper.userRequirement, req.body, false)) {
-        userService.updateUserData(helper.formatedData, req.params.id, function(result, message) {
-          res.json({
-            message: result,
-            error: message
-          });
-        });
+      var formatedUserObject = helper.validatAndFormatData(req.body, false);
+      if (formatedUserObject.bool.value) {
+        userHelper.updateUserData(res, formatedUserObject.data, req.params.id);
+      } else {
+        var message = { failed: 'compulsory fields Missing' };
+        helper.messageResponder(res, false, message, 400);
       }
     },
     deleteUser: function(req, res) {
-      userService.deleteOneUser(req.params.id, function(result, message) {
-        res.json({ users: message });
-      });
+      if (req.params.id.isNumber()) {
+        userHelper.removeUser(res, req.params.id);
+      } else {
+        var message = { failed: 'Invalid document id' };
+        helper.messageResponder(res, false, message, 400);
+      }
     },
     getOneUsers: function(req, res) {
       var id = req.params.id;
-      userService.getUsers({ _id: id }, function(result, userData) {
-        if (result) {
-          res.json({ users: userData });
-        } else {
-          res.json({
-            message: 'User does not exisit',
-            error: userData
-          });
-        }
-      });
+      if (id.isNumber()) {
+        userService.findUsers({ _id: id }, function(bool, message) {
+          helper.dataResponder(res, bool, message[0], 'user', 204);
+        });
+      } else {
+        var message = { failed: 'Invalid document id' };
+        helper.messageResponder(res, false, message, 400);
+      }
     },
     getAllUsers: function(req, res) {
-      userService.getUsers({}, function(result, userData) {
-        if (result) {
-          res.json({ users: userData });
-        } else {
-          res.json({
-            message: 'User does not exisit',
-            error: userData
-          });
-        }
+      userService.findUsers({}, function(bool, result) {
+        helper.dataResponder(res, bool, result, 'user', 204);
       });
     }
   };

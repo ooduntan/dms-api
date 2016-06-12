@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
 (function() {
+  'use strict';
 
+  require('./server/controllers/dateClass');
   var bodyParser = require('body-parser');
   var config = require('./config');
   var mongoose = require('mongoose');
