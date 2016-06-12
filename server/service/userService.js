@@ -1,24 +1,28 @@
 (function() {
   'use strict';
   var users = require('../models/userModel'),
+    query = require('./query'),
     bcrypt = require('../middleware/security');
 
   module.exports = {
     saveUser: function(userData, cb) {
-      var newUser = new users(userData);
-      newUser.save(function(err) {
-        return err ? cb(false, err) : cb(true, err);
-      });
+      query.saveQuery(users, userData, cb);
+      // var newUser = new users(userData);
+      // newUser.save(function(err) {
+      //   return err ? cb(false, err) : cb(true, err);
+      // });
     },
     findUsers: function(searchTerm, cb) {
-      users.find(searchTerm, function(err, user) {
-        return err ? cb(false, err) : cb(true, user);
-      });
+      query.findQuery(users, searchTerm, cb);
+      // users.find(searchTerm, function(err, user) {
+      //   return err ? cb(false, err) : cb(true, user);
+      // });
     },
     deleteUserById: function(userId, cb) {
-      users.remove({ _id: userId }, function(err) {
-        return err ? cb(err, false) : cb('', true);
-      });
+      query.deleteQuery(users, { _id: userId }, cb);
+      // users.remove({ _id: userId }, function(err) {
+      //   return err ? cb(err, false) : cb('', true);
+      // });
     },
     updateUserInfoObj: function(newUserNameObj, userNameObj) {
       for (var keys in newUserNameObj) {
@@ -40,12 +44,14 @@
       });
     },
     UpdateOneUser: function(id, userData, cb) {
-      var query = { _id: id };
-      var field = { $set: userData };
-      var option = { new: true };
-      users.findOneAndUpdate(query, field, option, function(err, user) {
-        return err ? cb(false, err) : cb(true, user);
-      });
+      query.updateQuery(users, id, userData, cb);
+
+      // var query = { _id: id };
+      // var field = { $set: userData };
+      // var option = { new: true };
+      // users.findOneAndUpdate(query, field, option, function(err, user) {
+      //   return err ? cb(false, err) : cb(true, user);
+      // });
     },
     encryptAndUpdateData: function(userInfo, id, cb) {
       var _this = this;
