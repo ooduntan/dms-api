@@ -18,4 +18,4 @@
     startAt: 1
   });
   module.exports = modelAsset.model('roles', roleSchema);
-})();
+}());

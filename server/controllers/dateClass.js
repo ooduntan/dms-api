@@ -5,4 +5,4 @@
     this.setDate(this.getDate() + parseInt(days));
     return this;
   };
-})();
+}());
