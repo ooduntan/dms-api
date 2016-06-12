@@ -1,6 +1,7 @@
 (function() {
   'use strict';
   var modelAsset = require('./modelPrerequisite');
+
   modelAsset.initIncrement();
 
   var roleSchema = new modelAsset.schema({
