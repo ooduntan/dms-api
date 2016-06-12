@@ -1,6 +1,7 @@
 (function() {
   'use strict';
-  var docModel = require('../models/documentModel');
+  var docModel = require('../models/documentModel'),
+    query = require('./query');
 
   function queryBuilder(query) {
     var searchBy = {
@@ -16,7 +17,6 @@
     var result = { createdAt: {} };
     for (var key in query) {
       if (searchBy[key] !== undefined) {
-        if (true) {}
         result[searchBy[key]] = makeQuery(query[key], key);
       }
     }
@@ -39,35 +39,30 @@
 
   module.exports = {
     saveDoc: function(docData, cb) {
-      var docs = new docModel(docData);
-      docs.save(function(err) {
-        return err ? cb(false, err) : cb(true, err);
-      });
+      query.saveQuery(docModel, docData, cb);
     },
     getDoc: function(searchTerm, cb) {
-      docModel.find(searchTerm, function(err, docs) {
-        return err ? cb(false, err) : cb(true, docs);
-      });
+      query.findQuery(docModel, searchTerm, cb);
     },
     deleteDocById: function(docId, cb) {
-      docModel.remove({ _id: docId }, function(err) {
-        return err ? cb(false, err) : cb(true, err);
-      });
+      query.deleteQuery(docModel, { _id: docId }, cb);
     },
     updateADoc: function(docInfo, id, cb) {
-      var query = { _id: id };
-      var field = { $set: docInfo };
-      var option = { new: true };
-
       docInfo.updatedAt = Date.now();
-      docModel.findOneAndUpdate(query, field, option, function(err, doc) {
-        return err ? cb(false, err) : cb(true, doc);
-      });
+      query.updateQuery(docModel, id, docInfo, cb);
+      // var query = { _id: id };
+      // var field = { $set: docInfo };
+      // var option = { new: true };
+
+      // docInfo.updatedAt = Date.now();
+      // docModel.findOneAndUpdate(query, field, option, function(err, doc) {
+      //   return err ? cb(false, err) : cb(true, doc);
+      // });
     },
     findAndRemove: function(searchTerm, cb) {
       var _this = this;
       docModel.find(searchTerm, function(err, docs) {
-        if (docs.length <= 0) {
+        if (docs.length <= 0 || err) {
           return cb(false, 'Not found');
         } else {
           _this.deleteDocById({ _id: docs[0]._id }, cb);
@@ -78,15 +73,14 @@
       var limitNumber = Math.max(0, searchTerm.limit) || 10;
       var offset = Math.max(0, searchTerm.offset) || 0;
       var query = queryBuilder(searchTerm);
-      console.log(query);
       docModel.find(query)
-        .skip(parseInt(offset))
-        .limit(parseInt(limitNumber))
+        .skip(parseInt(offset, 10))
+        .limit(parseInt(limitNumber, 10))
         .sort('-createdAt')
         .exec(function(err, docs) {
           return err ? cb(false, err) : cb(true, docs);
         });
-    },
+    }
 
   };
 }());
