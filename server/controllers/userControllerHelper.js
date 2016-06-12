@@ -3,15 +3,39 @@
 
   var helper = require('./controllerHelper');
   var userService = require('../service/userService');
+  var roleService = require('../service/roleService');
   var auth = require('../middleware/auth');
   var encrypt = require('../middleware/security');
 
-  module.exports = {
-    saveUser: function(responseObject, userData) {
+  var privateFunctions = {
+    saveUserDataWithValidRole: function(responseObject, userData) {
+      var _this = this;
+      roleService.getRoles({ role: userData.role }, function(bool, role) {
+        if (role.length > 0) {
+          userData.role = role[0]._id;
+          _this.saveUserData(responseObject, userData);
+        } else {
+          var message = { failed: 'Invalid User role' };
+          helper.messageResponder(responseObject, false, message, 400);
+        }
+      });
+    },
+
+    saveUserData: function(responseObject, userData) {
       userService.saveUser(userData, function(bool, message) {
         var result = { success: message, failed: message };
         helper.messageResponder(responseObject, bool, result, 401);
       });
+    }
+  };
+
+  module.exports = {
+    saveUser: function(responseObject, userData) {
+      if (userData.role !== undefined) {
+        privateFunctions.saveUserDataWithValidRole(responseObject, userData);
+      } else {
+        privateFunctions.saveUserData(responseObject, userData);
+      }
     },
 
     verifyUser: function(responseObj, userData) {

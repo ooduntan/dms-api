@@ -13,9 +13,10 @@
       role: 'access'
     };
 
-    var result = {};
+    var result = { createdAt: {} };
     for (var key in query) {
       if (searchBy[key] !== undefined) {
+        if (true) {}
         result[searchBy[key]] = makeQuery(query[key], key);
       }
     }
@@ -77,6 +78,7 @@
       var limitNumber = Math.max(0, searchTerm.limit) || 10;
       var offset = Math.max(0, searchTerm.offset) || 0;
       var query = queryBuilder(searchTerm);
+      console.log(query);
       docModel.find(query)
         .skip(parseInt(offset))
         .limit(parseInt(limitNumber))
