@@ -1,9 +1,8 @@
 (function() {
   'use strict';
-  require('./stringClass');
-  var helper = require('./controllerHelper');
-  var docService = require('../service/docService');
-  var docHelper = require('./documentHelper');
+  var helper = require('./controllerHelper'),
+    docService = require('../service/docService'),
+    docHelper = require('./documentHelper');
 
   module.exports = {
     createDoc: function(req, res) {
@@ -19,12 +18,7 @@
     },
     findDocId: function(req, res) {
       docService.getDoc({ _id: req.params.id }, function(bool, documents) {
-        if (bool) {
-          helper.dataResponder(res, bool, documents, 'doc', 204);
-        } else {
-          var message = { failed: 'Document does not exist' };
-          helper.messageResponder(res, false, message, 400);
-        }
+        helper.searchResponse(res, bool, documents, 'documents');
       });
     },
     getAllDoc: function(req, res) {

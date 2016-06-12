@@ -126,6 +126,15 @@
         });
       }
     },
+    searchResponse: function(respondObj, bool, result, name) {
+      if (bool) {
+        this.dataResponder(respondObj, bool, result, name, 204);
+      } else {
+        var message = { failed: name + ' does not exist' };
+        this.messageResponder(respondObj, false, message, 400);
+      }
+
+    },
     dataResponder: function(res, bool, result, resultName, httpCode) {
       if (bool) {
         var response = {};

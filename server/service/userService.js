@@ -45,13 +45,6 @@
     },
     UpdateOneUser: function(id, userData, cb) {
       query.updateQuery(users, id, userData, cb);
-
-      // var query = { _id: id };
-      // var field = { $set: userData };
-      // var option = { new: true };
-      // users.findOneAndUpdate(query, field, option, function(err, user) {
-      //   return err ? cb(false, err) : cb(true, user);
-      // });
     },
     encryptAndUpdateData: function(userInfo, id, cb) {
       var _this = this;

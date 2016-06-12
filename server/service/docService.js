@@ -50,14 +50,6 @@
     updateADoc: function(docInfo, id, cb) {
       docInfo.updatedAt = Date.now();
       query.updateQuery(docModel, id, docInfo, cb);
-      // var query = { _id: id };
-      // var field = { $set: docInfo };
-      // var option = { new: true };
-
-      // docInfo.updatedAt = Date.now();
-      // docModel.findOneAndUpdate(query, field, option, function(err, doc) {
-      //   return err ? cb(false, err) : cb(true, doc);
-      // });
     },
     findAndRemove: function(searchTerm, cb) {
       var _this = this;
