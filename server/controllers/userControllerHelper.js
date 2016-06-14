@@ -5,20 +5,47 @@
   var userService = require('../service/userService');
   var roleService = require('../service/roleService');
   var auth = require('../middleware/auth');
-  var encrypt = require('../middleware/security');
+  var oneWayencrypt = require('../middleware/security');
+  var twoWayCrypt = require('../middleware/reversibleEncrypt');
 
   var privateFunctions = {
     saveUserDataWithValidRole: function(responseObject, userData) {
       var _this = this;
-      roleService.getRoles({ role: userData.role }, function(bool, role) {
+
+      this.getRoleId(responseObject, userData.role, function(roleId) {
+        userData.role = roleId;
+        _this.saveUserData(responseObject, userData);
+      });
+    },
+
+    getRoleId: function(responseObject, userRole, cb) {
+      roleService.getRoles({ role: userRole }, function(bool, role) {
         if (role.length > 0) {
-          userData.role = role[0]._id;
-          _this.saveUserData(responseObject, userData);
+          cb(role[0]._id);
         } else {
           var message = { failed: 'Invalid User role' };
           helper.messageResponder(responseObject, false, message, 400);
         }
       });
+    },
+
+    checkExistingData: function(resposeObj, newUserData, userId, cb) {
+      var _this = this;
+      if (newUserData.role !== undefined) {
+        this.getRoleId(resposeObj, newUserData.role, function(roleId) {
+          newUserData.role = roleId;
+          _this.updateData(newUserData, userId, cb);
+        });
+      } else {
+        this.updateData(newUserData, userId, cb);
+      }
+    },
+    updateData: function(newUserData, userId, cb) {
+      if (newUserData.password !== undefined) {
+        userService.encryptAndUpdateData(newUserData, userId, cb);
+      } else {
+        userService.findAndUpdateOneUser(newUserData, userId, cb);
+      }
     },
 
     saveUserData: function(responseObject, userData) {
@@ -53,9 +80,9 @@
     },
     compareEncryptedPass: function(responseObj, pass, userData) {
 
-      encrypt.comparePass(pass, userData.password, function(isMatched) {
+      oneWayencrypt.comparePass(pass, userData.password, function(isMatched) {
         if (isMatched) {
-          var token = auth.createToken(userData);
+          var token = twoWayCrypt.encrypt(auth.createToken(userData));
           helper.dataResponder(responseObj, isMatched, token, 'token', 402);
         } else {
           var result = { failed: 'Oops!!! Invalid Username/Password' };
@@ -77,18 +104,11 @@
         helper.messageResponder(res, false, message, 400);
       }
     },
-    updateUserData: function(resposeObj, newUserInfo, userId) {
-      if (newUserInfo.password !== undefined) {
-        userService.encryptAndUpdateData(newUserInfo, userId,
-          function(bool, message) {
-            helper.dataResponder(resposeObj, bool, message, 'user', 400);
-          });
-      } else {
-        userService.findAndUpdateOneUser(newUserInfo, userId,
-          function(bool, message) {
-            helper.dataResponder(resposeObj, bool, message, 'user', 400);
-          });
-      }
+    updateUserData: function(resposeObj, newUserData, userId) {
+      privateFunctions.checkExistingData(resposeObj, newUserData, userId,
+        function(bool, message) {
+          helper.dataResponder(resposeObj, bool, message, 'user', 400);
+        });
     }
   };
 

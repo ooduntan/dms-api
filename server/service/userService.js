@@ -7,22 +7,12 @@
   module.exports = {
     saveUser: function(userData, cb) {
       query.saveQuery(users, userData, cb);
-      // var newUser = new users(userData);
-      // newUser.save(function(err) {
-      //   return err ? cb(false, err) : cb(true, err);
-      // });
     },
     findUsers: function(searchTerm, cb) {
       query.findQuery(users, searchTerm, cb);
-      // users.find(searchTerm, function(err, user) {
-      //   return err ? cb(false, err) : cb(true, user);
-      // });
     },
     deleteUserById: function(userId, cb) {
       query.deleteQuery(users, { _id: userId }, cb);
-      // users.remove({ _id: userId }, function(err) {
-      //   return err ? cb(err, false) : cb('', true);
-      // });
     },
     updateUserInfoObj: function(newUserNameObj, userNameObj) {
       for (var keys in newUserNameObj) {
@@ -34,7 +24,6 @@
     },
     findAndUpdateOneUser: function(userInfo, id, cb) {
       var _this = this;
-
       users.findById(id, function(err, user) {
         if (userInfo.name !== undefined) {
           userInfo.name = _this.updateUserInfoObj(userInfo.name, user.name);

@@ -11,6 +11,7 @@
   router.delete('/documents/:id', DocumentCtrl.deleteDoc);
   router.put('/documents/:id', DocumentCtrl.updateDoc);
   router.get('/users/:id/documents', DocumentCtrl.findDocByUser);
+
   module.exports = router;
 
 }());
