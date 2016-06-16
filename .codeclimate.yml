@@ -3,3 +3,5 @@ languages:
 ratings:
    paths:
      - '**.js'
+exclude_paths:
+  - "tests/*"
