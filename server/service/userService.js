@@ -24,12 +24,18 @@
     },
     findAndUpdateOneUser: function(userInfo, id, cb) {
       var _this = this;
-      users.findById(id, function(err, user) {
-        if (userInfo.name !== undefined) {
-          userInfo.name = _this.updateUserInfoObj(userInfo.name, user.name);
-        }
+      query.findQuery(users, id, function(bool, user) {
 
-        _this.UpdateOneUser(id, userInfo, cb);
+        if (bool && user.length > 0) {
+          user = user[0];
+          if (userInfo.name !== undefined) {
+            userInfo.name = _this.updateUserInfoObj(userInfo.name, user.name);
+          }
+
+          _this.UpdateOneUser(id, userInfo, cb);
+        } else {
+          cb(false, 'Invalid user');
+        }
       });
     },
     UpdateOneUser: function(id, userData, cb) {

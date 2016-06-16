@@ -62,8 +62,12 @@
         userService.findUsers({ _id: id }, function(bool, message) {
           helper.dataResponder(res, bool, message[0], 'user', 204);
         });
+      } else if (id.isUserName()) {
+        userService.findUsers({ username: id }, function(bool, message) {
+          helper.dataResponder(res, bool, message[0], 'user', 204);
+        });
       } else {
-        var message = { failed: 'Invalid document id' };
+        var message = { failed: 'Invalid username/id' };
         helper.messageResponder(res, false, message, 400);
       }
     },

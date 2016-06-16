@@ -7,7 +7,4 @@ logs
 
 # Runtime data
 node_modules
-
-# Configuration files
-config.js
-server/data/token.txt
+coverage

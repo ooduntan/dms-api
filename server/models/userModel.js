@@ -21,10 +21,12 @@
     email: {
       type: String,
       unique: true,
+      sparse: true,
       trim: true,
     },
     username: {
       type: String,
+      sparse: true,
       unique: true,
       trim: true
     },

@@ -6,6 +6,9 @@
   String.prototype.isValidName = function() {
     return !/[^\w -]/.test(this.trim());
   };
+  String.prototype.isUserName = function() {
+    return !/[^\w-\_\.]/.test(this.trim());
+  };
   String.prototype.isNumber = function() {
     return !/\D/.test(this);
   };

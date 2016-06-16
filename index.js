@@ -24,11 +24,19 @@
   dms.use(bodyParser.urlencoded({ extended: true }));
   dms.use(require('./server/routes'));
 
-  dms.listen(config.port, function(error) {
+  var server = dms.listen(config.port, function(error) {
     if (error) {
       console.log(error);
     } else {
       console.log('DMS is running');
     }
   });
+
+  module.exports = {
+    app: dms,
+    server: server,
+    killServer: function() {
+      server.close();
+    }
+  };
 }());

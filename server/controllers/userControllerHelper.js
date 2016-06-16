@@ -18,6 +18,13 @@
       });
     },
 
+    updateWithUserQuery: function(resposeObj, newUserData, query) {
+      this.checkExistingData(resposeObj, newUserData, query,
+        function(bool, message) {
+          helper.dataResponder(resposeObj, bool, message, 'user', 400);
+        });
+    },
+
     getRoleId: function(responseObject, userRole, cb) {
       roleService.getRoles({ role: userRole }, function(bool, role) {
         if (role.length > 0) {
@@ -101,14 +108,21 @@
         this.verifyUser(respondObj, cleanUserData.data);
       } else {
         var message = { failed: 'Oops!!! I got wrong user details' };
-        helper.messageResponder(res, false, message, 400);
+        helper.messageResponder(respondObj, false, message, 400);
       }
     },
     updateUserData: function(resposeObj, newUserData, userId) {
-      privateFunctions.checkExistingData(resposeObj, newUserData, userId,
-        function(bool, message) {
-          helper.dataResponder(resposeObj, bool, message, 'user', 400);
-        });
+      var query = {};
+      if (userId.isNumber()) {
+        query._id = userId;
+        privateFunctions.updateWithUserQuery(resposeObj, newUserData, query);
+      } else if (userId.isUserName()) {
+        query.username = userId;
+        privateFunctions.updateWithUserQuery(resposeObj, newUserData, query);
+      } else {
+        var message = { failed: 'Invalild put request params' };
+        helper.messageResponder(resposeObj, false, message, 402);
+      }
     }
   };
 

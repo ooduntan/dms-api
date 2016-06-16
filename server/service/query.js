@@ -17,11 +17,10 @@
     },
     deleteQuery: function(modelObj, deleteQuery, cb) {
       modelObj.remove(deleteQuery, function(err) {
-        return err ? cb(false, err) : cb(true, err);
+        return err ? cb(false, err) : cb(true, 'removed');
       });
     },
-    updateQuery: function(modelObj, id, newData, cb) {
-      var query = { _id: id };
+    updateQuery: function(modelObj, query, newData, cb) {
       var field = { $set: newData };
       var option = { new: true };
       modelObj.findOneAndUpdate(query, field, option, function(err, data) {
