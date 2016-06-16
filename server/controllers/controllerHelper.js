@@ -1,12 +1,13 @@
 (function() {
   'use strict';
+
   var userService = require('../service/userService'),
     docService = require('../service/docService'),
     encrypt = require('../middleware/security');
 
   module.exports = {
     userRequirement: {
-      reqiure: ['firstname', 'lastname'],
+      reqiure: ['firstname', 'lastname', 'username', 'password'],
       fields: ['username', 'password', 'firstname', 'lastname', 'role', 'email']
     },
     requiredDoc: {
@@ -28,20 +29,41 @@
 
       return this.requiredLength(requiredNum, requiredData, allField);
     },
+    messageResponder: function(res, bool, result, httpCode) {
+      if (bool) {
+        res.json({
+          success: bool,
+          message: result.success
+        });
+      } else {
+        res.status(httpCode).send({
+          success: bool,
+          message: result.failed
+        });
+      }
+    },
+    dataResponder: function(res, bool, result, resultName, httpCode) {
+      if (bool) {
+        var response = {};
+        response[resultName] = result;
+        res.json(response);
+      } else {
+        res.status(httpCode).send({
+          success: bool,
+          message: result
+        });
+      }
+    },
     validateAData: function(dataType, data) {
+
       if (dataType === 'email') {
         return data.verifyEmail();
       } else if (dataType === 'lastname' || dataType === 'firstname') {
         return data.isValidName();
+      } else if (typeof(data) === 'string') {
+        return true;
       } else {
-        return data.isSentence();
-      }
-    },
-    formatUserData: function(key, value) {
-      if (key === 'firstname' || key === 'lastname') {
-        this.nameObject[key] = value;
-      } else {
-        this.formatedData.data[key] = value;
+        return false;
       }
     },
     encryptPass: function(password, cb) {
@@ -65,7 +87,8 @@
       var formatedData = { data: {}, bool: { value: false } };
 
       if (this.validateData(this.userRequirement.reqiure, userData, allfield)) {
-        formatedData.data = this.formatData(userData, this.userRequirement.fields);
+        formatedData.data = this.formatData(userData,
+          this.userRequirement.fields);
         formatedData.bool.value = true;
       }
 
@@ -112,41 +135,6 @@
       }
 
       return validData;
-    },
-    messageResponder: function(res, bool, result, httpCode) {
-      if (bool) {
-        res.json({
-          success: bool,
-          message: result.success
-        });
-      } else {
-        res.status(httpCode).send({
-          success: bool,
-          message: result.failed
-        });
-      }
-    },
-    searchResponse: function(respondObj, bool, result, name) {
-      if (bool) {
-        this.dataResponder(respondObj, bool, result, name, 204);
-      } else {
-        var message = { failed: name + ' does not exist' };
-        this.messageResponder(respondObj, false, message, 400);
-      }
-
-    },
-    dataResponder: function(res, bool, result, resultName, httpCode) {
-      if (bool) {
-        var response = {};
-        response[resultName] = result;
-        res.json(response);
-      } else {
-        res.status(httpCode).send({
-          success: bool,
-          message: result
-        });
-      }
     }
-
   };
 }());

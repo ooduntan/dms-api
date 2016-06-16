@@ -7,22 +7,12 @@
   module.exports = {
     saveUser: function(userData, cb) {
       query.saveQuery(users, userData, cb);
-      // var newUser = new users(userData);
-      // newUser.save(function(err) {
-      //   return err ? cb(false, err) : cb(true, err);
-      // });
     },
     findUsers: function(searchTerm, cb) {
       query.findQuery(users, searchTerm, cb);
-      // users.find(searchTerm, function(err, user) {
-      //   return err ? cb(false, err) : cb(true, user);
-      // });
     },
     deleteUserById: function(userId, cb) {
       query.deleteQuery(users, { _id: userId }, cb);
-      // users.remove({ _id: userId }, function(err) {
-      //   return err ? cb(err, false) : cb('', true);
-      // });
     },
     updateUserInfoObj: function(newUserNameObj, userNameObj) {
       for (var keys in newUserNameObj) {
@@ -34,13 +24,18 @@
     },
     findAndUpdateOneUser: function(userInfo, id, cb) {
       var _this = this;
+      query.findQuery(users, id, function(bool, user) {
 
-      users.findById(id, function(err, user) {
-        if (userInfo.name !== undefined) {
-          userInfo.name = _this.updateUserInfoObj(userInfo.name, user.name);
+        if (bool && user.length > 0) {
+          user = user[0];
+          if (userInfo.name !== undefined) {
+            userInfo.name = _this.updateUserInfoObj(userInfo.name, user.name);
+          }
+
+          _this.UpdateOneUser(id, userInfo, cb);
+        } else {
+          cb(false, 'Invalid user');
         }
-
-        _this.UpdateOneUser(id, userInfo, cb);
       });
     },
     UpdateOneUser: function(id, userData, cb) {

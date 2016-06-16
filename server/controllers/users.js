@@ -4,7 +4,9 @@
   var helper = require('./controllerHelper'),
     auth = require('../middleware/auth'),
     userService = require('../service/userService'),
+    twoWayCrypt = require('../middleware/reversibleEncrypt'),
     userHelper = require('./userControllerHelper');
+
 
   module.exports = {
     signUp: function(req, res) {
@@ -19,7 +21,8 @@
     authenticateUser: function(req, res, next) {
       var token = req.body.token || req.query.token || req.headers.token;
       if (token) {
-        auth.verifyToken(req, res, token, next);
+        var decryptedToken = twoWayCrypt.decrypt(token);
+        auth.verifyToken(req, res, decryptedToken, next);
       } else {
         var result = { failed: 'Access denied.' };
         helper.messageResponder(res, false, result, 403);
@@ -59,8 +62,12 @@
         userService.findUsers({ _id: id }, function(bool, message) {
           helper.dataResponder(res, bool, message[0], 'user', 204);
         });
+      } else if (id.isUserName()) {
+        userService.findUsers({ username: id }, function(bool, message) {
+          helper.dataResponder(res, bool, message[0], 'user', 204);
+        });
       } else {
-        var message = { failed: 'Invalid document id' };
+        var message = { failed: 'Invalid username/id' };
         helper.messageResponder(res, false, message, 400);
       }
     },
