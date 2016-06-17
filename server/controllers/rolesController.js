@@ -34,13 +34,13 @@
       if (req.params.id.isNumber() && req.params.id !== '1') {
         roleHelper.removeRole(res, req.params.id);
       } else {
-        var message = { failed: 'Invalid user id' };
+        var message = { failed: 'Invalid role id' };
         helper.messageResponder(res, false, message, 400);
       }
     },
     getOneRole: function(req, res) {
       roleService.getRoles({ _id: req.params.id }, function(bool, role) {
-        helper.searchResponse(res, bool, role, 'role');
+        helper.dataResponder(res, bool, role[0], 'role', 402);
       });
     }
   };

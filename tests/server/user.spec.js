@@ -5,9 +5,6 @@
   var should = require('should');
   var faker = require('faker');
 
-  // This agent refers to PORT where program is runninng.
-
-  //var server = supertest.agent('http://localhost:3001');
   var token;
   var userId;
 
