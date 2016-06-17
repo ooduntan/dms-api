@@ -15,10 +15,11 @@
 
     updateRoleCollections: function(responseObj, roleData, roleId) {
       var roleQuery = { role: roleData };
-      roleService.updateRole(roleQuery, roleId, function(bool, message) {
+      var roleIdQuery = { _id: roleId };
+      roleService.updateRole(roleQuery, roleIdQuery, function(bool, message) {
         if (message === null) {
           bool = false;
-          message = { failed: 'User does not exist' };
+          message = { failed: 'role does not exist' };
         }
         helper.messageResponder(responseObj, bool, message, 401);
       });
@@ -26,7 +27,7 @@
 
     removeRole: function(responseObj, roleId) {
       roleService.findAndRemoveRole({ _id: roleId }, function(bool, message) {
-        helper.dataResponder(responseObj, bool, message, 'doc', 401);
+        helper.dataResponder(responseObj, bool, message, 'role', 401);
       });
     }
   };
