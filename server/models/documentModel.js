@@ -29,9 +29,8 @@
       trim: true,
     },
     access: {
-      type: Number,
-      ref: 'roles',
-      default: 1
+      type: Array,
+      default: [1]
     }
   });
 
