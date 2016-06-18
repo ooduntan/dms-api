@@ -3,6 +3,7 @@
 
   var userService = require('../service/userService'),
     docService = require('../service/docService'),
+    roleService = require('../service/roleService'),
     encrypt = require('../middleware/security');
 
   module.exports = {
@@ -12,7 +13,7 @@
     },
     requiredDoc: {
       reqiure: ['title'],
-      fields: ['title', 'content']
+      fields: ['title', 'content', 'access']
     },
     roleRequirement: { require: ['role'], fields: ['role'] },
     validateData: function(requiredData, data, allField) {
@@ -117,15 +118,42 @@
       }
       return realObj;
     },
-    validateDocData: function(docData, allfields) {
+    validateDocData: function(docData, allfields, cb) {
       var validatedData = { data: {}, bool: { value: false } };
 
       if (this.validateData(this.requiredDoc.reqiure, docData, allfields)) {
         validatedData.bool.value = true;
         validatedData.data = this.formatData(docData, this.requiredDoc.fields);
+        this.vierifyRole(validatedData, cb);
       }
 
       return validatedData;
+    },
+    vierifyRole: function(validatedData, cb) {
+      if (validatedData.data.access !== undefined) {
+        this.checkRole(validatedData, cb);
+      } else {
+        cb(true, validatedData);
+      }
+    },
+    makeQuery: function(accessDataArray) {
+      var result = [];
+      accessDataArray.forEach(function(element, index) {
+        result.push({ _id: element.trim() });
+      });
+
+      return result;
+    },
+    checkRole: function(userData, cb) {
+      var rolesArray = userData.data.access.split(',');
+      var query = this.makeQuery(rolesArray);
+      roleService.getRoles({ $or: query }, function(bool, data) {
+        if (bool && data.length === rolesArray.length) {
+          cb(true, userData);
+        } else {
+          return cb(false, 'One or more roles does not exist');
+        }
+      });
     },
     validateRoles: function(roleData) {
       var validData = { data: {}, bool: { value: false } };

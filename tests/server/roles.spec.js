@@ -152,7 +152,7 @@
               .set({ token: token })
               .expect('Content-type', /json/)
               .end(function(err, res) {
-                roleId = res.body.roles[1]._id;
+                roleId = res.body.roles[3]._id;
                 res.body.roles.length.should.be.above(0);
                 done();
               });

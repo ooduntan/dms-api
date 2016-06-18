@@ -3,20 +3,39 @@
 
   var helper = require('./controllerHelper');
   var docService = require('../service/docService');
+  var roleService = require('../service/roleService');
 
   module.exports = {
     saveDoc: function(res, docData) {
+      var result = { success: docData.title + ' created!' };
       docService.saveDoc(docData, function(bool, message) {
-        var result = { success: docData.title + ' created!', failed: message };
+        result.failed = message;
         helper.messageResponder(res, bool, result, 401);
       });
     },
-    removeDoc: function(id, res) {
-      docService.findAndRemove({ _id: id }, function(bool, message) {
+    removeDoc: function(res, id, userData) {
+      docService.findAndRemove({ _id: id }, userData, function(bool, message) {
         helper.dataResponder(res, bool, message, 'doc', 401);
       });
     },
+    checkRoleAndSave: function(documentData, cb) {
+      var query = this.makeQuery(documentData.access);
+      roleService.getRoles({ $or: query }, function(bool, data) {
+        if (bool && data.length === documentData.access.length) {
+          docService.saveDoc(documentData, cb);
+        } else {
+          return cb(false, 'One or more roles does not exist');
+        }
+      });
+    },
+    makeQuery: function(accessDataArray) {
+      var result = [];
+      accessDataArray.forEach(function(element, index) {
+        result.push({ _id: element.trim() });
+      });
 
+      return result;
+    },
     findUserDoc: function(id, res) {
       docService.getDoc({ creator: id }, function(bool, message) {
         helper.dataResponder(res, bool, message, 'doc', 401);
@@ -32,17 +51,18 @@
         helper.dataResponder(res, bool, message, 'doc', 401);
       });
     },
-    updateDocCollections: function(docInfo, res, ownerId) {
-      docService.updateADoc(docInfo, ownerId, function(bool, data) {
-        helper.dataResponder(res, bool, data, 'doc', 400);
-      });
+    updateDocCollections: function(res, newDocData, userData, docId) {
+      docService.findAndUpdate(newDocData, docId, userData,
+        function(bool, data) {
+          helper.dataResponder(res, bool, data, 'doc', 400);
+        });
     },
-    helperWithAction: function(request, response, action, reply) {
-      if (request.params.id.isNumber()) {
-        this[action](request.params.id, response);
+    canView: function(userData, docData) {
+      if (userData._id === docData.creator ||
+        docData.access.indexOf(userData.role) > -1) {
+        return true;
       } else {
-        var message = { failed: 'Invalid ' + reply + ' id' };
-        this.messageResponder(response, false, message, 400);
+        return false;
       }
     }
   };
