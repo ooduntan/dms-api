@@ -7,6 +7,7 @@
 
   var token;
   var userId;
+  var roleData;
 
   // UNIT test begin
 
@@ -48,6 +49,44 @@
             server
               .post('/api/users/')
               .send({ username: nameObj.username, password: nameObj.password })
+              .expect('Content-type', /json/)
+              .end(function(err, res) {
+                // HTTP status should be 200
+                res.status.should.equal(400);
+                // Error key should be false.
+                res.body.success.should.equal(false);
+                done();
+              });
+          });
+
+        it('Rejects a user without invalid data',
+          function(done) {
+
+            // calling home page api
+            server
+              .post('/api/users/')
+              .send({ username: nameObj.username, password: nameObj.password })
+              .expect('Content-type', /json/)
+              .end(function(err, res) {
+                // HTTP status should be 200
+                res.status.should.equal(400);
+                // Error key should be false.
+                res.body.success.should.equal(false);
+                done();
+              });
+          });
+        it('Rejects a user with invalid data',
+          function(done) {
+
+            var invalidUserData = {
+              firstname: '&^*&^^&&^&',
+              lastname: '*&^*()*&(',
+              username: '___kdlkdnknkdn',
+              password: 'gusgysygsy'
+            };
+            server
+              .post('/api/users/')
+              .send(invalidUserData)
               .expect('Content-type', /json/)
               .end(function(err, res) {
                 // HTTP status should be 200
@@ -271,6 +310,22 @@
 
             });
 
+          it('GET user/:id should reject invalid username/id',
+            function(done) {
+              server
+                .get('/api/users/)khnk(')
+                .set({ token: token })
+                .expect('Content-type', /json/)
+                .end(function(err, res) {
+                  // HTTP status should be 200
+                  res.status.should.equal(400);
+                  res.body.message.should.equal('Invalid username/id');
+                  done();
+                });
+
+            });
+
+
         });
 
 
@@ -278,28 +333,6 @@
       describe('PUT user/:id should edit a user data when valid token is sent',
         function() {
 
-          it('PUT user/:useranme should edit a user data when valid ' +
-            'token is sent',
-            function(done) {
-
-              // calling home page api
-              var newName = faker.name.firstName();
-              server
-                .put('/api/users/' + nameObj.username)
-                .send({ username: newName })
-                .set({ token: token })
-                .expect('Content-type', /json/)
-                .end(function(err, res) {
-                  // HTTP status should be 200
-                  res.status.should.equal(200);
-                  // Error key should be false.
-                  res.body.user.should.be.json;
-                  // userId = res.body.user._id;
-                  res.body.user.should.have.property('username', newName);
-                  done();
-                });
-
-            });
 
           it('PUT user/:id should edit a user data when valid token is sent',
             function(done) {
@@ -322,9 +355,131 @@
 
             });
 
+          it('GET role for test',
+            function(done) {
+
+              // calling home page api
+
+              var newName = faker.name.firstName();
+              server
+                .get('/api/role/')
+                .set({ token: token })
+                .expect('Content-type', /json/)
+                .end(function(err, res) {
+                  // HTTP status should be 200
+                  res.status.should.equal(200);
+                  roleData = res.body.roles[2];
+                  // Error key should be false.
+                  res.body.roles.should.be.type('object');
+                  done();
+                });
+
+            });
+
+          it('PUT user/:id should edit a user data when valid token is sent',
+            function(done) {
+
+              // calling home page api
+
+              var newName = faker.name.firstName();
+              server
+                .put('/api/users/' + userId)
+                .send({ role: roleData.role })
+                .set({ token: token })
+                .expect('Content-type', /json/)
+                .end(function(err, res) {
+                  // HTTP status should be 200
+                  res.status.should.equal(200);
+                  // Error key should be false.
+                  res.body.user.should.be.type('object');
+                  res.body.user.should.have.property('role',
+                    roleData._id.toString());
+                  done();
+                });
+
+            });
+
+          it('Ensure that user can edit password',
+            function(done) {
+
+              // calling home page api
+
+              var newName = faker.name.firstName();
+              server
+                .put('/api/users/' + userId)
+                .send({ password: 'roleData.role' })
+                .set({ token: token })
+                .expect('Content-type', /json/)
+                .end(function(err, res) {
+                  // HTTP status should be 200
+                  res.status.should.equal(200);
+                  // Error key should be false.
+                  res.body.user.should.be.type('object');
+                  res.body.user.should.have.property('role',
+                    roleData._id.toString());
+                  done();
+                });
+
+            });
+
+          it('Ensure user can update name',
+            function(done) {
+
+              // calling home page api
+              var newName = faker.name.firstName();
+              server
+                .put('/api/users/' + userId)
+                .send({ firstname: 'steve', lastname: 'Oduntan' })
+                .set({ token: token })
+                .expect('Content-type', /json/)
+                .end(function(err, res) {
+                  res.status.should.equal(200);
+                  res.body.user.should.have.property('password');
+                  res.body.user.should.be.type('object');
+                  done();
+                });
+
+            });
+
+          it('PUT user/:id should not allow invalid role update',
+            function(done) {
+
+              // calling home page api
+              var newName = faker.name.firstName();
+              server
+                .put('/api/users/' + userId)
+                .send({ role: 'steve' })
+                .set({ token: token })
+                .expect('Content-type', /json/)
+                .end(function(err, res) {
+                  res.status.should.equal(400);
+                  // Error key should be false.
+                  res.body.success.should.equal(false);
+                  res.body.message.should.equal('Invalid User role');
+                  done();
+                });
+
+            });
+
         });
 
       describe('DELETE users/id should delete user', function() {
+        it('DELETE should should only work with user id',
+          function(done) {
+
+            server
+              .delete('/api/users/' + nameObj.username)
+              .set({ token: token })
+              .expect('Content-type', /json/)
+              .end(function(err, res) {
+                // HTTP status should be 200
+                res.status.should.equal(400);
+                // Error key should be false.
+                res.body.message.should.equal('Invalid user id');
+                done();
+              });
+          });
+
         it('DELETE user/:id should delete a user data',
           function(done) {
 
@@ -332,7 +487,6 @@
             var newName = faker.name.firstName();
             server
               .delete('/api/users/' + userId)
-              .send({ username: newName })
               .set({ token: token })
               .expect('Content-type', /json/)
               .end(function(err, res) {
@@ -350,7 +504,6 @@
             var newName = faker.name.firstName();
             server
               .get('/api/users/' + userId)
-              .send({ username: newName })
               .set({ token: token })
               .expect('Content-type', /json/)
               .end(function(err, res) {

@@ -149,7 +149,7 @@
           });
       });
 
-    it('Cr', function(done) {
+    it('Create second role for document test', function(done) {
       server
         .post('/api/role/')
         .send({ role: faker.lorem.word() })
@@ -284,6 +284,37 @@
               });
           });
 
+        it('Ensure that document role can be edited',
+          function(done) {
+
+            server
+              .put('/api/documents/' + docId._id)
+              .send({ access: '2' })
+              .set({ token: token })
+              .expect('Content-type', /json/)
+              .end(function(err, res) {
+                // HTTP status should be 200
+                res.status.should.equal(200);
+                res.body.doc.access[0].should.equal('2');
+                done();
+              });
+          });
+
+        it('Ensure that document cannot be updated with an invalid role',
+          function(done) {
+
+            server
+              .put('/api/documents/' + docId._id)
+              .send({ access: '0' })
+              .set({ token: token })
+              .expect('Content-type', /json/)
+              .end(function(err, res) {
+                // HTTP status should be 404 Not found
+                res.status.should.equal(400);
+                done();
+              });
+          });
+
 
         describe('Create a new user and a token', function() {
 
@@ -344,9 +375,9 @@
                 .expect('Content-type', /json/)
                 .set({ token: token2 })
                 .end(function(err, res) {
-                  // HTTP status should be 200
-                  res.status.should.equal(200);
-                  res.body.doc.should.equal('Access denied!');
+                  // HTTP status should be 403 FORBIDDEN
+                  res.status.should.equal(403);
+                  res.body.message.should.equal('Access denied!');
 
                   done();
                 });
@@ -363,7 +394,6 @@
                 .expect('Content-type', /json/)
                 .set({ token: token2 })
                 .end(function(err, res) {
-                  console.log(res.body);
                   // HTTP status should be 200
                   res.status.should.equal(401);
                   res.body.success.should.equal(false);
@@ -381,7 +411,6 @@
                 .expect('Content-type', /json/)
                 .set({ token: token })
                 .end(function(err, res) {
-                  console.log(res.body);
                   // HTTP status should be 200
                   res.status.should.equal(200);
                   res.body.doc.should.equal('removed');

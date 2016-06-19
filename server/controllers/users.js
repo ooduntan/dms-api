@@ -10,13 +10,15 @@
 
   module.exports = {
     signUp: function(req, res) {
-      var formatedUserObject = helper.validatAndFormatData(req.body, true);
-      if (formatedUserObject.bool.value) {
-        userHelper.saveUser(res, formatedUserObject.data);
-      } else {
-        var message = { failed: 'compulsory fields Missing' };
-        helper.messageResponder(res, false, message, 400);
-      }
+      helper.validatAndFormatData(req.body, true,
+        function(bool, formatedUserData) {
+          if (bool && typeof(formatedUserData) === 'object') {
+            userHelper.saveUser(res, formatedUserData);
+          } else {
+            var message = { failed: 'compulsory fields Missing' };
+            helper.messageResponder(res, false, message, 400);
+          }
+        });
     },
     authenticateUser: function(req, res, next) {
       var token = req.body.token || req.query.token || req.headers.token;
@@ -40,31 +42,30 @@
       }
     },
     editUser: function(req, res) {
-      var formatedUserObject = helper.validatAndFormatData(req.body, false);
-      if (formatedUserObject.bool.value) {
-        userHelper.updateUserData(res, formatedUserObject.data, req.params.id);
-      } else {
-        var message = { failed: 'compulsory fields Missing' };
-        helper.messageResponder(res, false, message, 400);
-      }
+      helper.validatAndFormatData(req.body, false,
+        function(bool, formatedUserData) {
+          if (bool && typeof(formatedUserData) === 'object') {
+            userHelper.updateUserData(res, formatedUserData, req.params.id);
+          } else {
+            var message = { failed: 'compulsory fields Missing' };
+            helper.messageResponder(res, false, message, 400);
+          }
+        });
     },
     deleteUser: function(req, res) {
       if (req.params.id.isNumber()) {
         userHelper.removeUser(res, req.params.id);
       } else {
-        var message = { failed: 'Invalid document id' };
+        var message = { failed: 'Invalid user id' };
         helper.messageResponder(res, false, message, 400);
       }
     },
     getOneUsers: function(req, res) {
       var id = req.params.id;
-      if (id.isNumber()) {
-        userService.findUsers({ _id: id }, function(bool, message) {
-          helper.dataResponder(res, bool, message[0], 'user', 204);
-        });
-      } else if (id.isUserName()) {
-        userService.findUsers({ username: id }, function(bool, message) {
-          helper.dataResponder(res, bool, message[0], 'user', 204);
+      if (id.isNumber() || id.isUserName()) {
+        var query = id.isNumber() ? { _id: id } : { username: id };
+        userService.findUsers(query, function(bool, message) {
+          helper.dataResponder(res, bool, message[0], 'user', 404);
         });
       } else {
         var message = { failed: 'Invalid username/id' };
@@ -73,7 +74,7 @@
     },
     getAllUsers: function(req, res) {
       userService.findUsers({}, function(bool, result) {
-        helper.dataResponder(res, bool, result, 'user', 204);
+        helper.dataResponder(res, bool, result, 'user', 404);
       });
     }
   };

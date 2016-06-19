@@ -6,8 +6,8 @@
 
   router.post('/documents', DocumentCtrl.createDoc);
   router.get('/documents', DocumentCtrl.getAllDoc);
-  router.get('/documents/:id', DocumentCtrl.findDocId);
   router.get('/documents/find/', DocumentCtrl.findDoc);
+  router.get('/documents/:id', DocumentCtrl.findDocById);
   router.delete('/documents/:id', DocumentCtrl.deleteDoc);
   router.put('/documents/:id', DocumentCtrl.updateDoc);
   router.get('/users/:id/documents', DocumentCtrl.findDocByUser);

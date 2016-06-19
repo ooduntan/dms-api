@@ -8,9 +8,9 @@
     createDoc: function(req, res) {
       var userId = req.decoded.user._id;
       helper.validateDocData(req.body, true, function(bool, validatedData) {
-        if (bool && validatedData.bool.value) {
-          validatedData.data.creator = userId;
-          docHelper.saveDoc(res, validatedData.data);
+        if (bool && typeof(validatedData) === 'object') {
+          validatedData.creator = userId;
+          docHelper.saveDoc(res, validatedData);
         } else {
           var report = validatedData || 'compulsory fields Missing';
           var message = { failed: report };
@@ -18,20 +18,21 @@
         }
       });
     },
-    findDocId: function(req, res) {
+    findDocById: function(req, res) {
       docService.getDoc({ _id: req.params.id }, function(bool, doc) {
-        var userData = req.decoded.user;
-        if (docHelper.canView(userData, doc[0])) {
-          helper.dataResponder(res, bool, doc, 'doc', 204);
+        if (bool && doc.length > 0) {
+          var userData = req.decoded.user;
+          docHelper.checkOwnerAccess(res, userData, doc[0]);
         } else {
-          var message = 'Access denied!';
-          helper.dataResponder(res, bool, message, 'doc', 204);
+          var message = 'Document does not exist!';
+          helper.dataResponder(res, bool, message, 'doc', 410);
         }
+
       });
     },
     getAllDoc: function(req, res) {
       docService.getDoc({}, function(bool, docData) {
-        helper.dataResponder(res, bool, docData, 'doc', 204);
+        helper.dataResponder(res, bool, docData, 'doc', 404);
       });
 
     },
@@ -40,7 +41,7 @@
         if (typeof(validData) === 'object' && bool) {
           var userData = req.decoded.user;
           var docId = req.params.id;
-          docHelper.updateDocCollections(res, validData.data, userData, docId);
+          docHelper.updateDocCollections(res, validData, userData, docId);
         } else {
           var message = validData || 'Invalid data!!!';
           var report = { failed: message };
@@ -60,6 +61,10 @@
     },
     findDoc: function(req, res) {
       console.log(req);
+
+      var message = 'Invalid data!!!';
+      var report = { failed: message };
+      helper.messageResponder(res, false, report, 400);
       // var searchExp = new RegExp(req.params.query, 'i');
       // var query = { $or: [{ 'title': searchExp }, { 'content': searchExp }] };
       // docHelper.searchDoc(query, res);

@@ -84,16 +84,15 @@
       }
       return 0;
     },
-    validatAndFormatData: function(userData, allfield) {
-      var formatedData = { data: {}, bool: { value: false } };
+    validatAndFormatData: function(userData, allfield, cb) {
 
       if (this.validateData(this.userRequirement.reqiure, userData, allfield)) {
-        formatedData.data = this.formatData(userData,
+        var formatedData = this.formatData(userData,
           this.userRequirement.fields);
-        formatedData.bool.value = true;
+        cb(true, formatedData);
+      } else {
+        return cb(false, 'compulsory fields Missing');
       }
-
-      return formatedData;
     },
     formatData: function(userData, fields) {
       var nameObj = {};
@@ -119,18 +118,16 @@
       return realObj;
     },
     validateDocData: function(docData, allfields, cb) {
-      var validatedData = { data: {}, bool: { value: false } };
 
       if (this.validateData(this.requiredDoc.reqiure, docData, allfields)) {
-        validatedData.bool.value = true;
-        validatedData.data = this.formatData(docData, this.requiredDoc.fields);
+        var validatedData = this.formatData(docData, this.requiredDoc.fields);
         this.vierifyRole(validatedData, cb);
+      } else {
+        return cb(false, 'invalid data');
       }
-
-      return validatedData;
     },
     vierifyRole: function(validatedData, cb) {
-      if (validatedData.data.access !== undefined) {
+      if (validatedData.access !== undefined) {
         this.checkRole(validatedData, cb);
       } else {
         cb(true, validatedData);
@@ -145,24 +142,24 @@
       return result;
     },
     checkRole: function(userData, cb) {
-      var rolesArray = userData.data.access.split(',');
+      var rolesArray = userData.access.trimWordEx().split(',');
       var query = this.makeQuery(rolesArray);
       roleService.getRoles({ $or: query }, function(bool, data) {
         if (bool && data.length === rolesArray.length) {
+          userData.access = rolesArray;
           cb(true, userData);
         } else {
           return cb(false, 'One or more roles does not exist');
         }
       });
     },
-    validateRoles: function(roleData) {
-      var validData = { data: {}, bool: { value: false } };
+    validateRoles: function(roleData, cb) {
       if (roleData.role !== undefined && roleData.role.isSentence()) {
-        validData.data.role = roleData.role;
-        validData.bool.value = true;
+        var validateRoles = roleData;
+        cb(true, validateRoles);
+      } else {
+        cb(false, 'Invalid Role data');
       }
-
-      return validData;
     }
   };
 }());

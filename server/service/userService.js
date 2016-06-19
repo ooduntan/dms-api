@@ -1,18 +1,18 @@
 (function() {
   'use strict';
-  var users = require('../models/userModel'),
+  var userObj = require('../models/userModel'),
     query = require('./query'),
     bcrypt = require('../middleware/security');
 
   module.exports = {
     saveUser: function(userData, cb) {
-      query.saveQuery(users, userData, cb);
+      query.saveQuery(userObj, userData, cb);
     },
     findUsers: function(searchTerm, cb) {
-      query.findQuery(users, searchTerm, cb);
+      query.findQuery(userObj, searchTerm, cb);
     },
     deleteUserById: function(userId, cb) {
-      query.deleteQuery(users, { _id: userId }, cb);
+      query.deleteQuery(userObj, { _id: userId }, cb);
     },
     updateUserInfoObj: function(newUserNameObj, userNameObj) {
       for (var keys in newUserNameObj) {
@@ -24,7 +24,7 @@
     },
     findAndUpdateOneUser: function(userInfo, id, cb) {
       var _this = this;
-      query.findQuery(users, id, function(bool, user) {
+      query.findQuery(userObj, id, function(bool, user) {
 
         if (bool && user.length > 0) {
           user = user[0];
@@ -39,7 +39,7 @@
       });
     },
     UpdateOneUser: function(id, userData, cb) {
-      query.updateQuery(users, id, userData, cb);
+      query.updateQuery(userObj, id, userData, cb);
     },
     encryptAndUpdateData: function(userInfo, id, cb) {
       var _this = this;
