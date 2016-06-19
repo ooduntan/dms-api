@@ -8,18 +8,13 @@
   module.exports = {
     createRole: function(req, res) {
       helper.validateRoles(req.body, function(bool, formatedRoleData) {
-        if (bool && typeof(formatedRoleData) === 'object') {
-          roleHelper.saveUserRole(res, formatedRoleData);
-        } else {
-          var message = { failed: 'Role not complete' };
-          helper.messageResponder(res, false, message, 400);
-        }
+        var errorMessage = 'Invalid role name';
+        helper.saveDataHandler(res, bool, formatedRoleData,
+          roleHelper.saveUserRole, errorMessage);
       });
     },
     getAllrole: function(req, res) {
-      roleService.getRoles({}, function(bool, rolesData) {
-        helper.dataResponder(res, bool, rolesData, 'roles', 404);
-      });
+      helper.getData(res, roleService.getRoles, 'roles');
     },
     editRole: function(req, res) {
       helper.validateRoles(req.body, function(bool, validData) {

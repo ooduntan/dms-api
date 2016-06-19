@@ -30,7 +30,7 @@
     },
     access: {
       type: Array,
-      default: [1]
+      default: ['1']
     }
   });
 

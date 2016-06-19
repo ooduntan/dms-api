@@ -10,14 +10,12 @@
 
   module.exports = {
     signUp: function(req, res) {
+
       helper.validatAndFormatData(req.body, true,
         function(bool, formatedUserData) {
-          if (bool && typeof(formatedUserData) === 'object') {
-            userHelper.saveUser(res, formatedUserData);
-          } else {
-            var message = { failed: 'compulsory fields Missing' };
-            helper.messageResponder(res, false, message, 400);
-          }
+          var errorMessage = 'compulsory fields Missing';
+          helper.saveDataHandler(res, bool, formatedUserData,
+            userHelper.saveUser, errorMessage);
         });
     },
     authenticateUser: function(req, res, next) {
@@ -73,9 +71,7 @@
       }
     },
     getAllUsers: function(req, res) {
-      userService.findUsers({}, function(bool, result) {
-        helper.dataResponder(res, bool, result, 'user', 404);
-      });
+      helper.getData(res, userService.findUsers, 'user');
     }
   };
 
