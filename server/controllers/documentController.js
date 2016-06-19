@@ -8,14 +8,16 @@
     createDoc: function(req, res) {
       var userId = req.decoded.user._id;
       helper.validateDocData(req.body, true, function(bool, validatedData) {
-        if (bool && typeof(validatedData) === 'object') {
+        var errorMessage;
+
+        if (bool) {
           validatedData.creator = userId;
-          docHelper.saveDoc(res, validatedData);
         } else {
-          var report = validatedData || 'compulsory fields Missing';
-          var message = { failed: report };
-          helper.messageResponder(res, false, message, 400);
+          errorMessage = validatedData;
         }
+
+        helper.saveDataHandler(res, bool, validatedData,
+          docHelper.saveDoc, errorMessage);
       });
     },
     findDocById: function(req, res) {
@@ -31,10 +33,7 @@
       });
     },
     getAllDoc: function(req, res) {
-      docService.getDoc({}, function(bool, docData) {
-        helper.dataResponder(res, bool, docData, 'doc', 404);
-      });
-
+      helper.getData(res, docService.getDoc, 'doc');
     },
     updateDoc: function(req, res) {
       helper.validateDocData(req.body, false, function(bool, validData) {

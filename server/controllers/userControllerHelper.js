@@ -28,7 +28,7 @@
     getRoleId: function(responseObject, userRole, cb) {
       roleService.getRoles({ role: userRole }, function(bool, role) {
         if (role.length > 0) {
-          cb(role[0]._id);
+          return cb(role[0]._id);
         } else {
           var message = { failed: 'Invalid User role' };
           helper.messageResponder(responseObject, false, message, 400);
