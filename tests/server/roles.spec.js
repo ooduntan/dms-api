@@ -167,11 +167,8 @@
               .send(roleObj.role3)
               .expect('Content-type', /json/)
               .end(function(err, res) {
-                console.log(res.body);
-                // HTTP status should be 200
+                // HTTP status should be 200 OK
                 res.status.should.equal(200);
-                // Error key should be false.
-                res.body.success.should.equal(true);
                 server
                   .get('/api/role/' + roleId)
                   .set({ token: token })
@@ -186,6 +183,24 @@
                     done();
                   });
 
+              });
+          });
+
+        it('Verify that role with invalid data will be rejected',
+          function(done) {
+            // calling home page api
+            server
+              .put('/api/role/' + roleId)
+              .send({ role: '%^&*(&^&*()' })
+              .set({ token: token })
+              .expect('Content-type', /json/)
+              .end(function(err, res) {
+                // HTTP status should be 200
+                res.status.should.equal(400);
+                // Error key should be false.
+                res.body.message.should.equal('Invalid data!!!');
+                res.body.success.should.equal(false);
+                done();
               });
           });
 

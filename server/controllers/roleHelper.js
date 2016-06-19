@@ -21,7 +21,7 @@
           bool = false;
           message = { failed: 'role does not exist' };
         }
-        helper.messageResponder(responseObj, bool, message, 401);
+        helper.dataResponder(responseObj, bool, message, 'role', 401);
       });
     },
 

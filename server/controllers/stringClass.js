@@ -16,6 +16,14 @@
     return !/[^a-z0-9\-\_ ]/i.test(this);
   };
 
+  /**
+   * [trimWordEx -- Removes wihte spaces within and at the edges of a sentences]
+   * @return {String} [A sentences separated with a single space]
+   */
+  String.prototype.trimWordEx = function() {
+    return this.trim().replace(/\s+/g, '');
+  };
+
   module.exports = String;
 
 }());

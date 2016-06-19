@@ -57,6 +57,7 @@
 
     saveUserData: function(responseObject, userData) {
       userService.saveUser(userData, function(bool, message) {
+
         var result = { success: message, failed: message };
         helper.messageResponder(responseObject, bool, result, 401);
       });
@@ -75,7 +76,6 @@
     verifyUser: function(responseObj, userData) {
       var search = { username: userData.username };
       var _this = this;
-
       userService.findUsers(search, function(bool, result) {
         if (result.length > 0) {
           _this.compareEncryptedPass(responseObj, userData.password, result[0]);
@@ -103,21 +103,23 @@
       });
     },
     validateAndCheckUser: function(respondObj, userData) {
-      var cleanUserData = helper.validatAndFormatData(userData, false);
-      if (cleanUserData.bool.value) {
-        this.verifyUser(respondObj, cleanUserData.data);
-      } else {
-        var message = { failed: 'Oops!!! I got wrong user details' };
-        helper.messageResponder(respondObj, false, message, 400);
-      }
+      var _this = this;
+      helper.validatAndFormatData(userData, false,
+        function(bool, cleanUserData) {
+          if (bool && typeof(cleanUserData) === 'object') {
+            _this.verifyUser(respondObj, cleanUserData);
+          } else {
+            var message = { failed: 'Oops!!! I got wrong user details' };
+            helper.messageResponder(respondObj, false, message, 400);
+          }
+        });
+
     },
     updateUserData: function(resposeObj, newUserData, userId) {
-      var query = {};
-      if (userId.isNumber()) {
-        query._id = userId;
-        privateFunctions.updateWithUserQuery(resposeObj, newUserData, query);
-      } else if (userId.isUserName()) {
-        query.username = userId;
+      var isNumber = userId.isNumber();
+      var isUser = userId.isUserName();
+      if (isNumber || isUser) {
+        var query = isNumber || isUser ? { _id: userId } : { username: userId };
         privateFunctions.updateWithUserQuery(resposeObj, newUserData, query);
       } else {
         var message = { failed: 'Invalild put request params' };

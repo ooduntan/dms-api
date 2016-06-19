@@ -28,6 +28,14 @@
         }
       });
     },
+    checkOwnerAccess: function(responseObj, userData, doc) {
+      if (this.canView(userData, doc)) {
+        helper.dataResponder(responseObj, true, doc, 'doc', 200);
+      } else {
+        var message = { failed: 'Access denied!' };
+        helper.messageResponder(responseObj, false, message, 403);
+      }
+    },
     makeQuery: function(accessDataArray) {
       var result = [];
       accessDataArray.forEach(function(element, index) {
