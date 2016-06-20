@@ -71,7 +71,8 @@
       }
     },
     getAllUsers: function(req, res) {
-      helper.getData(res, userService.findUsers, 'user');
+      var searchQuery = {};
+      helper.getData(res, searchQuery, userService.findUsers, 'user');
     }
   };
 

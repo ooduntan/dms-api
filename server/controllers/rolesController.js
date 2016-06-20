@@ -14,7 +14,8 @@
       });
     },
     getAllrole: function(req, res) {
-      helper.getData(res, roleService.getRoles, 'roles');
+      var searchQuery = {};
+      helper.getData(res, searchQuery, roleService.getRoles, 'roles');
     },
     editRole: function(req, res) {
       helper.validateRoles(req.body, function(bool, validData) {
