@@ -3,40 +3,6 @@
   var docModel = require('../models/documentModel'),
     query = require('./query');
 
-  function queryBuilder(query) {
-    var searchBy = {
-      date: 'createdAt',
-      before: 'createdAt',
-      after: 'createdAt',
-      edit: 'updatedAt',
-      owner: 'creator',
-      title: 'title',
-      role: 'access'
-    };
-
-    var result = { createdAt: {} };
-    for (var key in query) {
-      if (searchBy[key] !== undefined) {
-        result[searchBy[key]] = makeQuery(query[key], key);
-      }
-    }
-
-    return result;
-  }
-
-  function makeQuery(value, key) {
-    if (key === 'date') {
-      return { $gt: new Date(value), $lt: new Date(value).addDays(1) };
-    } else if (key === 'before') {
-      return { $lt: new Date(value) };
-    } else if (key === 'after') {
-      return { $gt: new Date(value).addDays(1) };
-    }
-
-    return value;
-  }
-
-
   module.exports = {
     saveDoc: function(docData, cb) {
       query.saveQuery(docModel, docData, cb);
@@ -51,6 +17,15 @@
       var updateQuery = { _id: docId };
       docInfo.updatedAt = Date.now();
       query.updateQuery(docModel, updateQuery, docInfo, cb);
+    },
+    findDocWithQuery: function(query, sortBy, limitNumber, offset, cb) {
+      docModel.find(query)
+        .skip(parseInt(offset, 10))
+        .limit(parseInt(limitNumber, 10))
+        .sort('-' + sortBy)
+        .exec(function(err, docs) {
+          return cb(true, docs);
+        });
     },
     findAndUpdate: function(newDocData, docId, userData, cb) {
       var _this = this;
@@ -107,18 +82,6 @@
       } else {
         return cb(false, 'FORBIDDEN');
       }
-    },
-    searchDoc: function(searchTerm, cb) {
-      var limitNumber = Math.max(0, searchTerm.limit) || 10;
-      var offset = Math.max(0, searchTerm.offset) || 0;
-      var query = queryBuilder(searchTerm);
-      docModel.find(query)
-        .skip(parseInt(offset, 10))
-        .limit(parseInt(limitNumber, 10))
-        .sort('-createdAt')
-        .exec(function(err, docs) {
-          return err ? cb(false, err) : cb(true, docs);
-        });
     }
 
   };

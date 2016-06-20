@@ -60,14 +60,13 @@
       if (result && typeof(formatedUserData) === 'object') {
         helperMethod(responseObj, formatedUserData);
       } else {
-        console.log(errorMessage);
         var message = { failed: errorMessage };
         this.messageResponder(responseObj, false, message, 400);
       }
     },
-    getData: function(responseObj, searchMethod, title) {
+    getData: function(responseObj, searchQuery, searchMethod, title) {
       var _this = this;
-      searchMethod({}, function(bool, result) {
+      searchMethod(searchQuery, function(bool, result) {
         _this.dataResponder(responseObj, bool, result, title, 404);
       });
     },

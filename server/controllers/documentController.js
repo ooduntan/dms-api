@@ -33,7 +33,7 @@
       });
     },
     getAllDoc: function(req, res) {
-      helper.getData(res, docService.getDoc, 'doc');
+      helper.getData(res, req.query, docHelper.searchDoc, 'doc');
     },
     updateDoc: function(req, res) {
       helper.validateDocData(req.body, false, function(bool, validData) {
@@ -49,9 +49,9 @@
       });
     },
     findDocByUser: function(req, res) {
-      var requestId = req.params.id;
-      var userData = req.decoded;
-      docHelper.findUserDoc(res, requestId, userData);
+      var queryString = req.query;
+      queryString.owner = req.params.id;
+      helper.getData(res, queryString, docHelper.searchDoc, 'doc');
     },
     deleteDoc: function(req, res) {
       var requestId = req.params.id;
@@ -59,14 +59,13 @@
       docHelper.removeDoc(res, requestId, userId);
     },
     findDoc: function(req, res) {
-      console.log(req);
-
-      var message = 'Invalid data!!!';
-      var report = { failed: message };
-      helper.messageResponder(res, false, report, 400);
-      // var searchExp = new RegExp(req.params.query, 'i');
-      // var query = { $or: [{ 'title': searchExp }, { 'content': searchExp }] };
-      // docHelper.searchDoc(query, res);
+      if (req.query.q !== undefined) {
+        helper.getData(res, req.query, docHelper.searchDoc, 'doc');
+      } else {
+        var message = 'Oops!!! You forgot to give me the keyword!';
+        var report = { failed: message };
+        helper.messageResponder(res, false, report, 400);
+      }
     }
   };
 
