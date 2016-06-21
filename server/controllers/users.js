@@ -1,16 +1,23 @@
 (function() {
   'use strict';
 
-  var helper = require('./controllerHelper'),
+  var helper = require('./helperClass/controllerHelper'),
     auth = require('../middleware/auth'),
     userService = require('../service/userService'),
     twoWayCrypt = require('../middleware/reversibleEncrypt'),
-    userHelper = require('./userControllerHelper');
+    userHelper = require('./helperClass/userControllerHelper');
 
 
   module.exports = {
+    /**
+     * signUp-- Validate user data and create a new user
+     * if the user data is valid. 
+     * @param  Object req [the request object]
+     * @param  Object res [the response object]
+     * @return Mixed     Returns a boolean to saveDataHandler function
+     * and a formated user data if valid else it return a string
+     */
     signUp: function(req, res) {
-
       helper.validatAndFormatData(req.body, true,
         function(bool, formatedUserData) {
           var errorMessage = 'compulsory fields Missing';
@@ -18,6 +25,13 @@
             userHelper.saveUser, errorMessage);
         });
     },
+
+    /**
+     * authenticateUser -- Verify if the token the user provide is valid
+     * @param  Object   req  [the request object]
+     * @param  Object   res  [the response object]
+     * @param  Function next [the next fuction in express middleware]
+     */
     authenticateUser: function(req, res, next) {
       var token = req.body.token || req.query.token || req.headers.token;
       if (token) {
@@ -28,6 +42,12 @@
         helper.messageResponder(res, false, result, 403);
       }
     },
+
+    /**
+     * login -- Verify is a username and password provided is valid and correct
+     * @param  Object   req  [the request object]
+     * @param  Object   res  [the response object]
+     */
     login: function(req, res) {
       var userData = {};
       if (req.body.username !== undefined && req.body.password !== undefined) {
@@ -39,6 +59,14 @@
         helper.messageResponder(res, false, result, 400);
       }
     },
+
+    /**
+     * editUser -- Validate and edit userdata
+     * @param  Object   req  [the request object]
+     * @param  Object   res  [the response object]
+     * @return Mixed    [return bool and the updated user data if 
+     * user data is true else it return flase]
+     */
     editUser: function(req, res) {
       helper.validatAndFormatData(req.body, false,
         function(bool, formatedUserData) {
@@ -50,6 +78,13 @@
           }
         });
     },
+
+    /**
+     * deleteUser -- Delete a user from the database.
+     * @param  Object   req  [the request object]
+     * @param  Object   res  [the response object]
+     * @return Mixed     [Bool and a string information of the action]
+     */
     deleteUser: function(req, res) {
       if (req.params.id.isNumber()) {
         userHelper.removeUser(res, req.params.id);
@@ -58,6 +93,13 @@
         helper.messageResponder(res, false, message, 400);
       }
     },
+
+    /**
+     * getOneUsers -- Fetch a user by ID or USERNAME from the database
+     * @param  Object   req  [the request object]
+     * @param  Object   res  [the response object]
+     * @return Mixed     [Boolean and an Object/String of the result]
+     */
     getOneUsers: function(req, res) {
       var id = req.params.id;
       if (id.isNumber() || id.isUserName()) {
@@ -70,9 +112,20 @@
         helper.messageResponder(res, false, message, 400);
       }
     },
+
+    /**
+     * getAllUsers -- Fetches all the user in the database
+     * @param  Object   req  [the request object]
+     * @param  Object   res  [the response object]
+     * @return Mixed     [Boolean and an Object/String of the result]
+     */
     getAllUsers: function(req, res) {
       var searchQuery = {};
       helper.getData(res, searchQuery, userService.findUsers, 'user');
+    },
+    logout: function(res, req) {
+      var message = { failed: 'You have logged out successfully!!!' };
+      helper.messageResponder(res, false, message, 200);
     }
   };
 

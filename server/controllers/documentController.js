@@ -1,13 +1,20 @@
 (function() {
   'use strict';
-  var helper = require('./controllerHelper'),
+  var helper = require('./helperClass/controllerHelper'),
     docService = require('../service/docService'),
-    docHelper = require('./documentHelper');
+    docHelper = require('./helperClass/documentHelper');
 
   module.exports = {
+
+    /**
+     * createDoc Create a new document in the in the database
+     * @param  Object   req  [the request object]
+     * @param  Object   res  [the response object]
+     * @return Mixed     [Boolean and an Object/String of the result]
+     */
     createDoc: function(req, res) {
       var userId = req.decoded.user._id;
-      helper.validateDocData(req.body, true, function(bool, validatedData) {
+      docHelper.validateDocData(req.body, true, function(bool, validatedData) {
         var errorMessage;
 
         if (bool) {
@@ -20,6 +27,13 @@
           docHelper.saveDoc, errorMessage);
       });
     },
+
+    /**
+     * findDocById -- fetch a document by its ID
+     * @param  Object   req  [the request object]
+     * @param  Object   res  [the response object]
+     * @return Mixed     [Boolean and an Object/String of the result]
+     */
     findDocById: function(req, res) {
       docService.getDoc({ _id: req.params.id }, function(bool, doc) {
         if (bool && doc.length > 0) {
@@ -32,11 +46,25 @@
 
       });
     },
+
+    /**
+     * getAllDoc Fetch all the document in the database 
+     * it uses getData in the helper class
+     * @param  Object   req  [the request object]
+     * @param  Object   res  [the response object]
+     */
     getAllDoc: function(req, res) {
       helper.getData(res, req.query, docHelper.searchDoc, 'doc');
     },
+
+    /**
+     * updateDoc -- Validate and update a document 
+     * @param  Object   req  [the request object]
+     * @param  Object   res  [the response object]
+     * @return Mixed     [Boolean and an Object/String of the result]
+     */
     updateDoc: function(req, res) {
-      helper.validateDocData(req.body, false, function(bool, validData) {
+      docHelper.validateDocData(req.body, false, function(bool, validData) {
         if (typeof(validData) === 'object' && bool) {
           var userData = req.decoded.user;
           var docId = req.params.id;
@@ -48,16 +76,37 @@
         }
       });
     },
+
+    /**
+     * findDocByUser -- Fetch a document that belongs to a particular user
+     * @param  Object   req  [the request object]
+     * @param  Object   res  [the response object]
+     * @return Mixed     [Boolean and an Object/String of the result]
+     */
     findDocByUser: function(req, res) {
       var queryString = req.query;
       queryString.owner = req.params.id;
       helper.getData(res, queryString, docHelper.searchDoc, 'doc');
     },
+
+    /**
+     * deleteDoc -- Delete a document by its ID
+     * @param  Object   req  [the request object]
+     * @param  Object   res  [the response object]
+     * @return Mixed     [Boolean and an Object/String of the result]
+     */
     deleteDoc: function(req, res) {
       var requestId = req.params.id;
       var userId = req.decoded.user;
       docHelper.removeDoc(res, requestId, userId);
     },
+
+    /**
+     * findDoc -- Searches the database for a match of the query parameter
+     * @param  Object   req  [the request object]
+     * @param  Object   res  [the response object]
+     * @return Mixed     [Boolean and an Object/String of the result]
+     */
     findDoc: function(req, res) {
       if (req.query.q !== undefined) {
         helper.getData(res, req.query, docHelper.searchDoc, 'doc');

@@ -7,6 +7,11 @@
 
   module.exports = {
 
+    /**
+     * encrypt - A two way encryption method that encrypt user data
+     * @param  {Sting} text [String to be encrypted]
+     * @return {String}      [An encrypted string]
+     */
     encrypt: function(text) {
       var cipher = crypto.createCipher(algorithm, password);
       try {
@@ -19,6 +24,11 @@
       }
     },
 
+    /**
+     * decrypt - A decryption method that decrypt user encrypted data
+     * @param  {String} text [The encrypted user data]
+     * @return {String}      [The decripted data]
+     */
     decrypt: function(text) {
       var decipher = crypto.createDecipher(algorithm, password);
       try {
