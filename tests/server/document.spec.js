@@ -5,7 +5,6 @@
   var server = require('supertest')(api);
   var should = require('should');
   var faker = require('faker');
-
   var token;
   var token2;
   var docId;
@@ -33,8 +32,6 @@
         title: faker.lorem.sentence(),
         content: faker.lorem.sentences(),
         access: '1, 2'
-
-
       }
     };
 
@@ -44,9 +41,7 @@
         .get('/api/documents/')
         .expect('Content-type', /json/)
         .end(function(err, res) {
-          // HTTP status should be 200
           res.status.should.equal(403);
-          // Error key should be false.
           res.body.success.should.equal(false);
           done();
         });
@@ -59,18 +54,14 @@
         .send(nameObj)
         .expect('Content-type', /json/)
         .end(function(err, res) {
-          // HTTP status should be 200
           res.status.should.equal(200);
-          // Error key should be false.
           res.body.success.should.equal(true);
           server
             .post('/api/users/login')
             .send({ username: nameObj.username, password: nameObj.password })
             .expect('Content-type', /json/)
             .end(function(err, res) {
-              // HTTP status should be 200
               res.status.should.equal(200);
-              // Error key should be false.
               token = res.body.token;
               res.body.token.should.be.type('string');
               done();
@@ -86,9 +77,7 @@
           .set({ token: token })
           .expect('Content-type', /json/)
           .end(function(err, res) {
-            // HTTP status should be 200
             res.status.should.equal(200);
-            // Error key should be false.
             res.body.doc.should.be.type('object');
 
             done();
@@ -104,15 +93,12 @@
           .set({ token: token })
           .expect('Content-type', /json/)
           .end(function(err, res) {
-            // HTTP status should be 200
             res.status.should.equal(200);
             res.body.success.should.equal(true);
             res.body.message.should.be.type('string');
-
             done();
           });
       });
-
 
     it('Verifies that a document is created with title and content',
       function(done) {
@@ -123,11 +109,9 @@
           .set({ token: token })
           .expect('Content-type', /json/)
           .end(function(err, res) {
-            // HTTP status should be 200
             res.status.should.equal(200);
             res.body.success.should.equal(true);
             res.body.message.should.be.type('string');
-
             done();
           });
       });
@@ -141,7 +125,6 @@
           .set({ token: token })
           .expect('Content-type', /json/)
           .end(function(err, res) {
-            // HTTP status should be 200
             res.status.should.equal(200);
             res.body.success.should.equal(true);
             res.body.message.should.be.type('string');
@@ -150,24 +133,23 @@
       });
 
     it('Create second role for document test', function(done) {
+
       server
         .post('/api/role/')
         .send({ role: faker.lorem.word() })
         .set({ token: token })
         .expect('Content-type', /json/)
         .end(function(err, res) {
-          // HTTP status should be 200
           res.status.should.equal(200);
           res.body.success.should.equal(true);
           res.body.message.should.be.type('string');
-
           done();
         });
     });
 
-
     it('Verify that documment can have multiple role',
       function(done) {
+
         documentObj.doc3.title = faker.lorem.sentence();
         server
           .post('/api/documents/')
@@ -175,15 +157,12 @@
           .set({ token: token })
           .expect('Content-type', /json/)
           .end(function(err, res) {
-            // HTTP status should be 200
             res.status.should.equal(200);
             res.body.success.should.equal(true);
             res.body.message.should.be.type('string');
-
             done();
           });
       });
-
 
     it('Verify that documment title is unquie',
       function(done) {
@@ -197,13 +176,9 @@
             res.status.should.equal(401);
             res.body.success.should.equal(false);
             res.body.message.should.be.type('object');
-
             done();
           });
       });
-
-
-
 
     it('Verify that documment cannot have role that doesnt exist',
       function(done) {
@@ -220,11 +195,9 @@
           .set({ token: token })
           .expect('Content-type', /json/)
           .end(function(err, res) {
-            // HTTP status should be 200
             res.status.should.equal(400);
             res.body.success.should.equal(false);
             res.body.message.should.equal('One or more roles does not exist');
-
             done();
           });
       });
@@ -241,11 +214,9 @@
               .set({ token: token })
               .expect('Content-type', /json/)
               .end(function(err, res) {
-                // HTTP status should be 200
                 res.status.should.equal(200);
                 res.body.success.should.equal(true);
                 res.body.message.should.be.type('string');
-
                 done();
               });
           });
@@ -262,7 +233,6 @@
                 docId = docs[(docs.length - 1)];
                 res.status.should.equal(200);
                 res.body.doc.length.should.be.above(0);
-
                 done();
               });
           });
@@ -277,7 +247,6 @@
               .set({ token: token })
               .expect('Content-type', /json/)
               .end(function(err, res) {
-                // HTTP status should be 200
                 res.status.should.equal(200);
                 res.body.doc.content.should.equal('Testing content');
                 done();
@@ -293,7 +262,6 @@
               .set({ token: token })
               .expect('Content-type', /json/)
               .end(function(err, res) {
-                // HTTP status should be 200
                 res.status.should.equal(200);
                 res.body.doc.access[0].should.equal('2');
                 done();
@@ -309,12 +277,10 @@
               .set({ token: token })
               .expect('Content-type', /json/)
               .end(function(err, res) {
-                // HTTP status should be 404 Not found
                 res.status.should.equal(400);
                 done();
               });
           });
-
 
         describe('Create a new user and a token', function() {
 
@@ -325,7 +291,6 @@
             password: faker.internet.password()
           };
 
-
           it('Create a new user',
             function(done) {
 
@@ -334,17 +299,11 @@
                 .send(newUser)
                 .expect('Content-type', /json/)
                 .end(function(err, res) {
-                  // HTTP status should be 200
                   res.status.should.equal(200);
                   res.body.success.should.equal(true);
-
                   done();
                 });
-
-
             });
-
-
 
           it('Login and create a new token and ensure that POST:login ' +
             ' only that needed data from the posted object',
@@ -355,17 +314,12 @@
                 .send(newUser)
                 .expect('Content-type', /json/)
                 .end(function(err, res) {
-                  // HTTP status should be 200
                   res.status.should.equal(200);
                   token2 = res.body.token;
                   res.body.token.should.be.type('string');
-
                   done();
                 });
-
-
             });
-
 
           it('Ensure a user does not view a document not assigned to them',
             function(done) {
@@ -375,16 +329,11 @@
                 .expect('Content-type', /json/)
                 .set({ token: token2 })
                 .end(function(err, res) {
-                  // HTTP status should be 403 FORBIDDEN
                   res.status.should.equal(403);
                   res.body.message.should.equal('Access denied!');
-
                   done();
                 });
-
-
             });
-
 
           it('Verify if a user cannot delete a document not assigned to them',
             function(done) {
@@ -394,11 +343,9 @@
                 .expect('Content-type', /json/)
                 .set({ token: token2 })
                 .end(function(err, res) {
-                  // HTTP status should be 200
                   res.status.should.equal(401);
                   res.body.success.should.equal(false);
                   res.body.message.should.equal('FORBIDDEN');
-
                   done();
                 });
             });
@@ -411,14 +358,10 @@
                 .expect('Content-type', /json/)
                 .set({ token: token })
                 .end(function(err, res) {
-                  // HTTP status should be 200
                   res.status.should.equal(200);
                   res.body.doc.should.equal('removed');
-
                   done();
                 });
-
-
             });
 
         });

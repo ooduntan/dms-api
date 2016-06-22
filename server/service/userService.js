@@ -1,5 +1,6 @@
 (function() {
   'use strict';
+
   var userObj = require('../models/userModel'),
     query = require('./query'),
     bcrypt = require('../middleware/security');
@@ -44,6 +45,7 @@
           userNameObj[keys] = newUserNameObj[keys];
         }
       }
+
       return userNameObj;
     },
 

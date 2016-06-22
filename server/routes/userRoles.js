@@ -12,4 +12,5 @@
   router.get('/role/:id', role.getOneRole);
 
   module.exports = router;
+
 }());

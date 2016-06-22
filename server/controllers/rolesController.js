@@ -1,21 +1,22 @@
 (function() {
   'use strict';
 
-  var helper = require('./helperClass/controllerHelper');
+  var helper = require('./helperFiles/controllerHelper');
   var roleService = require('../service/roleService');
-  var roleHelper = require('./helperClass/roleHelper');
+  var roleHelper = require('./helperFiles/roleHelper');
 
   module.exports = {
 
     /**
      * createRole -- Create a new role in the database
-     * @param  Object   req  [the request object]
-     * @param  Object   res  [the response object]
-     * @return Mixed     [Boolean and an Object/String of the result]
+     * @param  {Object}   req  [the request object]
+     * @param  {Object}   res  [the response object]
+     * @return {Mixed}     [Boolean and an Object/String of the result]
      */
     createRole: function(req, res) {
       helper.validateRoles(req.body, function(bool, formatedRoleData) {
         var errorMessage = 'Invalid role name';
+
         helper.saveDataHandler(res, bool, formatedRoleData,
           roleHelper.saveUserRole, errorMessage);
       });
@@ -23,21 +24,30 @@
 
     /**
      * getAllrole -- Get all the role in the database
-     * @param  Object   req  [the request object]
-     * @param  Object   res  [the response object]
-     * @return Mixed     [Boolean and an Object/String of the result]
+     * @param  {Object}   req  [the request object]
+     * @param  {Object}   res  [the response object]
+     * @return {Mixed}     [Boolean and an Object/String of the result]
      */
     getAllrole: function(req, res) {
       var searchQuery = {};
+
       helper.getData(res, searchQuery, roleService.getRoles, 'roles');
     },
+
+    /**
+     * editRole - Handles the put request to edit a role
+     * @param  {Object}   req  [the request object]
+     * @param  {Object}   res  [the response object]
+     */
     editRole: function(req, res) {
       helper.validateRoles(req.body, function(bool, validData) {
         var roleId = req.params.id;
+
         if (bool && typeof(validData) === 'object') {
           roleHelper.updateRoleCollections(res, validData.role, roleId);
         } else {
           var message = { failed: 'Invalid data!!!' };
+
           helper.messageResponder(res, false, message, 400);
         }
       });
@@ -54,6 +64,7 @@
         roleHelper.removeRole(res, req.params.id);
       } else {
         var message = { failed: 'Invalid role id' };
+
         helper.messageResponder(res, false, message, 400);
       }
     },
@@ -70,5 +81,4 @@
       });
     }
   };
-
 }());

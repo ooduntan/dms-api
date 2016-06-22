@@ -122,6 +122,7 @@
      */
     getData: function(responseObj, searchQuery, searchMethod, title) {
       var _this = this;
+
       searchMethod(searchQuery, function(bool, result) {
         _this.dataResponder(responseObj, bool, result, title, 404);
       });
@@ -168,6 +169,7 @@
       if (allField) {
         return userFields === requiredData.length ? true : false;
       }
+
       return true;
     },
 
@@ -237,6 +239,7 @@
         realObj.name = mergeObj;
         return realObj;
       }
+
       return realObj;
     },
 

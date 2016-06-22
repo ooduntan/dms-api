@@ -5,7 +5,6 @@
   var server = require('supertest')(api);
   var should = require('should');
   var faker = require('faker');
-
   var token;
   var token2;
   var docs;
@@ -56,16 +55,14 @@
 
       describe('Create user token for test', function() {
 
-
         it('Create a sample user token', function(done) {
+
           server
             .post('/api/users/')
             .send(nameObj1)
             .expect('Content-type', /json/)
             .end(function(err, res) {
-              // HTTP status should be 200
               res.status.should.equal(200);
-              // Error key should be false.
               res.body.success.should.equal(true);
               server
                 .post('/api/users/login')
@@ -75,9 +72,7 @@
                 })
                 .expect('Content-type', /json/)
                 .end(function(err, res) {
-                  // HTTP status should be 200
                   res.status.should.equal(200);
-                  // Error key should be false.
                   token = res.body.token;
                   res.body.token.should.be.type('string');
                   done();
@@ -85,16 +80,14 @@
             });
         });
 
-
         it('Create a sample user token', function(done) {
+
           server
             .post('/api/users/')
             .send(nameObj2)
             .expect('Content-type', /json/)
             .end(function(err, res) {
-              // HTTP status should be 200
               res.status.should.equal(200);
-              // Error key should be false.
               res.body.success.should.equal(true);
               server
                 .post('/api/users/login')
@@ -104,65 +97,55 @@
                 })
                 .expect('Content-type', /json/)
                 .end(function(err, res) {
-                  // HTTP status should be 200
                   res.status.should.equal(200);
-                  // Error key should be false.
                   token2 = res.body.token;
                   res.body.token.should.be.type('string');
                   done();
                 });
             });
-
-
         });
-
-
-
-
       });
 
       describe('Create multiple document for test ', function() {
 
         it('create documents for test', function(done) {
+
           server
             .post('/api/documents/')
             .set({ token: token })
             .send(documentObj.doc4)
             .expect('Content-type', /json/)
             .end(function(err, res) {
-              // HTTP status should be 200
               res.status.should.equal(200);
               res.body.success.should.equal(true);
               res.body.message.should.be.type('string');
               done();
             });
-
         });
 
         it('create documents for test', function(done) {
+
           server
             .post('/api/documents/')
             .send(documentObj.doc1)
             .set({ token: token })
             .expect('Content-type', /json/)
             .end(function(err, res) {
-              // HTTP status should be 200
               res.status.should.equal(200);
               res.body.success.should.equal(true);
               res.body.message.should.be.type('string');
               done();
             });
-
         });
 
         it('create documents for test', function(done) {
+
           server
             .post('/api/documents/')
             .set({ token: token2 })
             .send(documentObj.doc2)
             .expect('Content-type', /json/)
             .end(function(err, res) {
-              // HTTP status should be 200
               res.status.should.equal(200);
               res.body.success.should.equal(true);
               res.body.message.should.be.type('string');
@@ -171,23 +154,19 @@
         });
 
         it('create documents for test', function(done) {
+
           server
             .post('/api/documents/')
             .set({ token: token2 })
             .send(documentObj.doc3)
             .expect('Content-type', /json/)
             .end(function(err, res) {
-              console.log(res.body);
-              // HTTP status should be 200
               res.status.should.equal(200);
               res.body.success.should.equal(true);
               res.body.message.should.be.type('string');
               done();
             });
-
         });
-
-
       });
 
 
@@ -202,13 +181,11 @@
                 .set({ token: token })
                 .expect('Content-type', /json/)
                 .end(function(err, res) {
-                  // HTTP status should be 200
                   res.status.should.equal(200);
                   res.body.doc.should.be.type('object');
                   docs = res.body.doc;
                   done();
                 });
-
             });
 
           it('Ensure that document can be pagination using limit',
@@ -219,24 +196,21 @@
                 .set({ token: token })
                 .expect('Content-type', /json/)
                 .end(function(err, res) {
-                  // HTTP status should be 200
                   res.status.should.equal(200);
                   res.body.doc.should.be.type('object');
                   res.body.doc.length.should.equal(2);
                   done();
                 });
-
             });
-
 
           it('Ensure that document can be pagination with offset',
             function(done) {
+
               server
                 .get('/api/documents/?offset=2')
                 .set({ token: token })
                 .expect('Content-type', /json/)
                 .end(function(err, res) {
-                  // HTTP status should be 200
                   res.status.should.equal(200);
                   res.body.doc.should.be.type('object');
                   res.body.doc[0].title.should.not.equal(docs[0].title);
@@ -247,12 +221,12 @@
 
           it('Ensure that document can be pagination with limit and offset',
             function(done) {
+
               server
                 .get('/api/documents/?limit=1&offset=2')
                 .set({ token: token })
                 .expect('Content-type', /json/)
                 .end(function(err, res) {
-                  // HTTP status should be 200
                   res.status.should.equal(200);
                   res.body.doc.should.be.type('object');
                   res.body.doc.length.should.equal(1);
@@ -261,37 +235,34 @@
                     .equal(docs[2].content);
                   done();
                 });
-
             });
-
         });
+
       describe('Ensure that document can be searched', function() {
 
         it('Ensure that document by a particular user can be fetched',
           function(done) {
+
             server
               .get('/api/users/1/documents/')
               .set({ token: token })
               .expect('Content-type', /json/)
               .end(function(err, res) {
-                // HTTP status should be 200
                 res.status.should.equal(200);
                 res.body.doc.should.be.type('object');
                 res.body.doc[0].creator.should.equal(1);
                 done();
               });
-
-
           });
 
         it('Ensure that document can be searched by content and title',
           function(done) {
+
             server
               .get('/api/documents/?q=this')
               .set({ token: token })
               .expect('Content-type', /json/)
               .end(function(err, res) {
-                // HTTP status should be 200
                 res.status.should.equal(200);
                 searchedDoc = res.body.doc;
                 res.body.doc.should.be.type('object');
@@ -308,7 +279,6 @@
               .set({ token: token })
               .expect('Content-type', /json/)
               .end(function(err, res) {
-                // HTTP status should be 200
                 res.status.should.equal(200);
                 res.body.doc.should.be.type('object');
                 res.body.doc.length.should.be.above(0);
@@ -325,12 +295,10 @@
               .set({ token: token })
               .expect('Content-type', /json/)
               .end(function(err, res) {
-                // HTTP status should be 200
                 res.status.should.equal(200);
                 res.body.doc.should.be.type('object');
                 res.body.doc[0]._id.should.be
                   .above(res.body.doc[res.body.doc.length - 1]._id);
-
                 done();
               });
 
@@ -338,12 +306,12 @@
 
         it('Ensure that search result can be sort by access type',
           function(done) {
+
             server
               .get('/api/documents/?q=this&sort=access')
               .set({ token: token })
               .expect('Content-type', /json/)
               .end(function(err, res) {
-                // HTTP status should be 200
                 res.status.should.equal(200);
                 res.body.doc.should.be.type('object');
                 res.body.doc[0].access[0].should.be
@@ -358,10 +326,10 @@
       describe('Ensure that search result can be filtered by any kind' +
         ' of document properties',
         function() {
+
           var dateObj = new Date();
           var today = dateObj.getFullYear() + '-' + (dateObj.getMonth() + 1) +
             '-' + dateObj.getDate();
-
           var tommorow = dateObj.getFullYear() + '-' + dateObj.getMonth() +
             '-' + dateObj.getDate() + 1;
 
@@ -373,13 +341,11 @@
                 .set({ token: token })
                 .expect('Content-type', /json/)
                 .end(function(err, res) {
-                  // HTTP status should be 200
                   res.status.should.equal(200);
                   res.body.doc.should.be.type('object');
                   res.body.doc.length.should.be.above(0);
                   done();
                 });
-
             });
 
           it('Ensure that search result can be filtered by date edited',
@@ -390,23 +356,21 @@
                 .set({ token: token })
                 .expect('Content-type', /json/)
                 .end(function(err, res) {
-                  // HTTP status should be 200
                   res.status.should.equal(200);
                   res.body.doc.should.be.type('object');
                   res.body.doc.length.should.be.above(0);
                   done();
                 });
-
             });
 
           it('Ensure that search result can be filtered by creator',
             function(done) {
+
               server
                 .get('/api/documents/?q=this&owner=' + docs[0].creator)
                 .set({ token: token })
                 .expect('Content-type', /json/)
                 .end(function(err, res) {
-                  // HTTP status should be 200
                   res.status.should.equal(200);
                   res.body.doc.should.be.type('object');
                   res.body.doc.length.should.be.above(0);
@@ -416,12 +380,12 @@
 
           it('Ensure that search result can be filtered by role',
             function(done) {
+
               server
                 .get('/api/documents/?q=this&role=1')
                 .set({ token: token })
                 .expect('Content-type', /json/)
                 .end(function(err, res) {
-                  // HTTP status should be 200
                   res.status.should.equal(200);
                   res.body.doc.should.be.type('object');
                   var index = Math.floor(Math.random() * res.body.doc.length);
@@ -432,12 +396,12 @@
 
           it('Ensure that search result can be sorted by title',
             function(done) {
+
               server
                 .get('/api/documents/?q=this&title=0990')
                 .set({ token: token })
                 .expect('Content-type', /json/)
                 .end(function(err, res) {
-                  // HTTP status should be 200
                   res.status.should.equal(200);
                   res.body.doc.should.be.type('object');
                   res.body.doc.length.should.equal(0);

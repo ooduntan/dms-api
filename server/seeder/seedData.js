@@ -1,5 +1,6 @@
 (function() {
   'use strict';
+
   var mongoose = require('mongoose');
   var roleObj = require('../service/roleService');
 

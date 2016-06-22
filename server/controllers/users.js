@@ -1,14 +1,15 @@
 (function() {
   'use strict';
 
-  var helper = require('./helperClass/controllerHelper'),
+  var helper = require('./helperFiles/controllerHelper'),
     auth = require('../middleware/auth'),
     userService = require('../service/userService'),
     twoWayCrypt = require('../middleware/reversibleEncrypt'),
-    userHelper = require('./helperClass/userControllerHelper');
+    userHelper = require('./helperFiles/userControllerHelper');
 
 
   module.exports = {
+
     /**
      * signUp-- Validate user data and create a new user
      * if the user data is valid. 
@@ -21,6 +22,7 @@
       helper.validatAndFormatData(req.body, true,
         function(bool, formatedUserData) {
           var errorMessage = 'compulsory fields Missing';
+
           helper.saveDataHandler(res, bool, formatedUserData,
             userHelper.saveUser, errorMessage);
         });
@@ -36,9 +38,11 @@
       var token = req.body.token || req.query.token || req.headers.token;
       if (token) {
         var decryptedToken = twoWayCrypt.decrypt(token);
+
         auth.verifyToken(req, res, decryptedToken, next);
       } else {
         var result = { failed: 'Access denied.' };
+
         helper.messageResponder(res, false, result, 403);
       }
     },
@@ -53,9 +57,11 @@
       if (req.body.username !== undefined && req.body.password !== undefined) {
         userData.username = req.body.username;
         userData.password = req.body.password;
+
         userHelper.validateAndCheckUser(res, userData);
       } else {
         var result = { failed: 'Invalid User Data.' };
+
         helper.messageResponder(res, false, result, 400);
       }
     },
@@ -74,6 +80,7 @@
             userHelper.updateUserData(res, formatedUserData, req.params.id);
           } else {
             var message = { failed: 'compulsory fields Missing' };
+
             helper.messageResponder(res, false, message, 400);
           }
         });
@@ -90,6 +97,7 @@
         userHelper.removeUser(res, req.params.id);
       } else {
         var message = { failed: 'Invalid user id' };
+
         helper.messageResponder(res, false, message, 400);
       }
     },
@@ -102,13 +110,16 @@
      */
     getOneUsers: function(req, res) {
       var id = req.params.id;
+
       if (id.isNumber() || id.isUserName()) {
         var query = id.isNumber() ? { _id: id } : { username: id };
+
         userService.findUsers(query, function(bool, message) {
           helper.dataResponder(res, bool, message[0], 'user', 404);
         });
       } else {
         var message = { failed: 'Invalid username/id' };
+
         helper.messageResponder(res, false, message, 400);
       }
     },
@@ -121,10 +132,12 @@
      */
     getAllUsers: function(req, res) {
       var searchQuery = {};
+
       helper.getData(res, searchQuery, userService.findUsers, 'user');
     },
     logout: function(res, req) {
       var message = { failed: 'You have logged out successfully!!!' };
+
       helper.messageResponder(res, false, message, 200);
     }
   };
