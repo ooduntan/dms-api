@@ -102,7 +102,6 @@
 
     it('Verifies that a document is created with title and content',
       function(done) {
-
         server
           .post('/api/documents/')
           .send(documentObj.doc2)
@@ -151,6 +150,7 @@
       function(done) {
 
         documentObj.doc3.title = faker.lorem.sentence();
+
         server
           .post('/api/documents/')
           .send(documentObj.doc3)

@@ -161,4 +161,5 @@
       docService.findDocWithQuery(query, sortBy, limitNumber, offset, cb);
     }
   };
+
 }());

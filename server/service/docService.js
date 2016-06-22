@@ -167,6 +167,6 @@
         return cb(false, 'FORBIDDEN');
       }
     }
-
   };
+
 }());

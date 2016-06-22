@@ -18,4 +18,5 @@
       modelSchema.plugin(ai.plugin, settings);
     }
   };
+
 }());
