@@ -230,7 +230,7 @@
               .expect('Content-type', /json/)
               .end(function(err, res) {
                 var docs = res.body.doc;
-                docId = docs[(docs.length - 1)];
+                docId = docs[0];
                 res.status.should.equal(200);
                 res.body.doc.length.should.be.above(0);
                 done();
