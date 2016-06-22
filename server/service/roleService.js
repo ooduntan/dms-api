@@ -49,6 +49,7 @@
      */
     findAndRemoveRole: function(searchTerm, cb) {
       var _this = this;
+
       roles.find(searchTerm, function(err, roles) {
         if (roles.length <= 0 || err) {
           return cb(false, 'Not found');

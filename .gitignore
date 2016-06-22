@@ -8,3 +8,4 @@ logs
 # Runtime data
 node_modules
 coverage
+.env

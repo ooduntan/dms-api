@@ -54,7 +54,6 @@
         return err ? cb(false, err) : cb(true, data);
       });
     }
-
   };
 
 }());

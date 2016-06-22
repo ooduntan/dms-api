@@ -23,8 +23,8 @@
         role: 'access',
         q: '$or'
       };
-
       var result = {};
+
       for (var key in query) {
         if (searchBy[key] !== undefined) {
           result[searchBy[key]] = this.makeSearchQuery(query[key], key);
@@ -82,7 +82,6 @@
      * @return {Function}             [Return a callback function]
      */
     validateDocData: function(docData, allfields, cb) {
-
       if (helper.validateData(helper.requiredDoc.reqiure, docData, allfields)) {
         var validData = helper.formatData(docData, helper.requiredDoc.fields);
         helper.vierifyRole(validData, cb);

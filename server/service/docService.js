@@ -1,5 +1,6 @@
 (function() {
   'use strict';
+
   var docModel = require('../models/documentModel'),
     query = require('./query');
 
@@ -40,6 +41,7 @@
      */
     updateADoc: function(docInfo, docId, cb) {
       var updateQuery = { _id: docId };
+
       docInfo.updatedAt = Date.now();
       query.updateQuery(docModel, updateQuery, docInfo, cb);
     },
@@ -71,6 +73,7 @@
      */
     findAndUpdate: function(newDocData, docId, userData, cb) {
       var _this = this;
+
       var searchTerm = { _id: docId };
       query.findQuery(docModel, searchTerm, function(bool, message) {
         if (bool && message.length > 0) {
@@ -100,12 +103,13 @@
       var currentUserRole = accessData.userId.role;
       var currentUserId = accessData.userId._id;
       var docOwner = accessData.owner;
+
       if (roleId.indexOf(currentUserRole) > -1 || this.forAllUser(roleId) ||
         this.isOwner(docOwner, currentUserId)) {
-
         this.updateADoc(docNewData, docId, cb);
       } else {
         var message = 'Access Denied!';
+
         cb(false, message);
       }
     },
@@ -138,6 +142,7 @@
      */
     findAndRemove: function(searchTerm, userData, cb) {
       var _this = this;
+
       docModel.find(searchTerm, function(err, docs) {
         _this.checkUserAccessAndDeleteDoc(err, userData, docs, cb);
       });

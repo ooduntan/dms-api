@@ -1,6 +1,7 @@
 (function() {
   'use strict';
 
+  require('dotenv').config({ silent: true });
   // Loads the custom string class functions
   require('./server/controllers/utils/stringClass');
   // Loads the custom Date class functions

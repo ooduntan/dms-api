@@ -63,6 +63,7 @@
      */
     checkExistingData: function(resposeObj, newUserData, userId, cb) {
       var _this = this;
+
       if (newUserData.role !== undefined) {
         this.getRoleId(resposeObj, newUserData.role, function(roleId) {
           newUserData.role = roleId;
@@ -94,8 +95,8 @@
      */
     saveUserData: function(responseObject, userData) {
       userService.saveUser(userData, function(bool, message) {
-
         var result = { success: message, failed: message };
+
         helper.messageResponder(responseObject, bool, result, 401);
       });
     }
@@ -124,11 +125,13 @@
     verifyUser: function(responseObj, userData) {
       var search = { username: userData.username };
       var _this = this;
+
       userService.findUsers(search, function(bool, result) {
         if (result.length > 0) {
           _this.compareEncryptedPass(responseObj, userData.password, result[0]);
         } else {
           var message = { failed: 'Oops!!! Invalid Username/Password' };
+
           helper.messageResponder(responseObj, false, message, 400);
         }
       });
@@ -141,13 +144,14 @@
      * @param  {Object} userData    [User data]
      */
     compareEncryptedPass: function(responseObj, pass, userData) {
-
       oneWayencrypt.comparePass(pass, userData.password, function(isMatched) {
         if (isMatched) {
           var token = twoWayCrypt.encrypt(auth.createToken(userData));
+
           helper.dataResponder(responseObj, isMatched, token, 'token', 402);
         } else {
           var result = { failed: 'Oops!!! Invalid Username/Password' };
+
           helper.messageResponder(responseObj, isMatched, result, 400);
         }
       });
@@ -177,6 +181,7 @@
             _this.verifyUser(respondObj, cleanUserData);
           } else {
             var message = { failed: 'Oops!!! I got wrong user details' };
+
             helper.messageResponder(respondObj, false, message, 400);
           }
         });
@@ -194,9 +199,11 @@
       var isUser = userId.isUserName();
       if (isNumber || isUser) {
         var query = isNumber || isUser ? { _id: userId } : { username: userId };
+
         privateFunctions.updateWithUserParams(resposeObj, newUserData, query);
       } else {
         var message = { failed: 'Invalild put request params' };
+
         helper.messageResponder(resposeObj, false, message, 402);
       }
     }

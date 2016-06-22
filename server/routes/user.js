@@ -1,9 +1,9 @@
 (function() {
   'use strict';
+
   var UserCtrl = require('../controllers/users');
   var express = require('express');
   var router = express.Router();
-
 
   router.post('/users', UserCtrl.signUp);
   router.post('/users/login', UserCtrl.login);
@@ -17,4 +17,5 @@
   router.get('/users/logout', UserCtrl.logout);
 
   module.exports = router;
+
 }());

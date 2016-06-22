@@ -27,6 +27,7 @@
     updateRoleCollections: function(responseObj, roleData, roleId) {
       var roleQuery = { role: roleData };
       var roleIdQuery = { _id: roleId };
+
       roleService.updateRole(roleQuery, roleIdQuery, function(bool, message) {
         if (message === null) {
           bool = false;
