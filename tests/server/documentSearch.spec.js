@@ -49,7 +49,6 @@
     }
   };
 
-
   describe('DOCUMENT ROUTE API (search feature)',
     function() {
 
@@ -169,7 +168,6 @@
         });
       });
 
-
       describe('Ensure that all document can be fetched and paginated',
         function() {
 
@@ -284,7 +282,6 @@
                 res.body.doc.length.should.be.above(0);
                 done();
               });
-
           });
 
         it('Ensure that search result can be sort by date created',
@@ -301,7 +298,6 @@
                   .above(res.body.doc[res.body.doc.length - 1]._id);
                 done();
               });
-
           });
 
         it('Ensure that search result can be sort by access type',
@@ -314,13 +310,11 @@
               .end(function(err, res) {
                 res.status.should.equal(200);
                 res.body.doc.should.be.type('object');
-                res.body.doc[0].access[0].should.be
-                  .above(res.body.doc[res.body.doc.length - 1].access[0]);
+                var lastDoc = res.body.doc[res.body.doc.length - 1].access[0];
+                (res.body.doc[0].access[0] >= lastDoc).should.equal(true);
                 done();
               });
-
           });
-
       });
 
       describe('Ensure that search result can be filtered by any kind' +
@@ -407,9 +401,7 @@
                   res.body.doc.length.should.equal(0);
                   done();
                 });
-
             });
         });
-
     });
 }());
