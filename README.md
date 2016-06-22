@@ -139,13 +139,10 @@ Request type | Endpoint | Action
 ------------ | -------- | ------ 
 POST | /api/role | Create a new role 
 GET | /api/role | Retrieve all roles 
+PUT | /api/role/:id | Edit a role
+GET | /api/role/:id | Retrieve a role
+DELETE | /api/role/:id | Delete a role
 
-_*Types*_
-
-Request type | Endpoint | Action 
------------- | -------- | ------ 
-POST | /api/documents | Create a new document type 
-GET | /api/documents | Retrieve all document types 
 
 Testing.
 --------
