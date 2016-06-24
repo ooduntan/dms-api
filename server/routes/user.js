@@ -7,8 +7,10 @@
 
   router.post('/users', UserCtrl.signUp);
   router.post('/users/login', UserCtrl.login);
-  /* All routes that require authentication should be palced 
-   after the authenticateUser middleware */
+  /**
+   * All routes that require authentication should be palced
+   * after the authenticateUser middleware 
+   */
   router.use(UserCtrl.authenticateUser);
   router.get('/users', UserCtrl.getAllUsers);
   router.put('/users/:id', UserCtrl.editUser);

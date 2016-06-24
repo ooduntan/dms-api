@@ -67,7 +67,7 @@
 
           _this.UpdateOneUser(id, userInfo, cb);
         } else {
-          cb(false, 'Invalid user');
+          return cb(false, 'Invalid user');
         }
       });
     },

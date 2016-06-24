@@ -85,7 +85,7 @@
           };
           _this.checkUserAndUpdateDocData(newDocData, accessData, docId, cb);
         } else {
-          cb(false, 'Invalid Document!');
+          return cb(false, 'Invalid Document!');
         }
       });
 
@@ -110,7 +110,7 @@
       } else {
         var message = 'Access Denied!';
 
-        cb(false, message);
+        return cb(false, message);
       }
     },
 

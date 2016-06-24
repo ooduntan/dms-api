@@ -12,7 +12,7 @@
      * userRequirement -- An object of the compulsory and required userdata
      */
     userRequirement: {
-      reqiure: ['firstname', 'lastname', 'username', 'password'],
+      require: ['firstname', 'lastname', 'username', 'password'],
       fields: ['username', 'password', 'firstname', 'lastname', 'role', 'email']
     },
 
@@ -20,7 +20,7 @@
      * requiredDoc  An object of the compulsory and required documents
      */
     requiredDoc: {
-      reqiure: ['title'],
+      require: ['title'],
       fields: ['title', 'content', 'access']
     },
 
@@ -42,7 +42,7 @@
       var requiredNum = 0;
 
       for (var key = 0; key < userDataKeys.length; key++) {
-        if (this.validateAData(userDataKeys[key], data[userDataKeys[key]])) {
+        if (this.isValid(userDataKeys[key], data[userDataKeys[key]])) {
           requiredNum += this.checkIfRequired(requiredData, userDataKeys[key]);
         } else {
           return false;
@@ -134,16 +134,20 @@
      * @param  {String} data     [The data you want to validate]
      * @return {Boolean}          [True if valid false otherwise]
      */
-    validateAData: function(dataType, data) {
+    isValid: function(dataType, data) {
       if (dataType === 'email') {
         return data.verifyEmail();
-      } else if (dataType === 'lastname' || dataType === 'firstname') {
-        return data.isValidName();
-      } else if (typeof(data) === 'string') {
-        return true;
-      } else {
-        return false;
       }
+
+      if (dataType === 'lastname' || dataType === 'firstname') {
+        return data.isValidName();
+      }
+
+      if (typeof(data) === 'string') {
+        return true;
+      }
+
+      return false;
     },
 
     /**
@@ -188,17 +192,16 @@
     },
 
     /**
-     * validatAndFormatData - Help validate and formate data
+     * validateAndFormatData - Help validate and formate data
      * @param  {Object}   userData [The data to be validated]
      * @param  {Boolean}   allfield [True if all the fields are compulsory]
      * @param  {Function} cb       [Pass result to the callback]
      */
-    validatAndFormatData: function(userData, allfield, cb) {
-
-      if (this.validateData(this.userRequirement.reqiure, userData, allfield)) {
+    validateAndFormatData: function(userData, allfield, cb) {
+      if (this.validateData(this.userRequirement.require, userData, allfield)) {
         var formatedData = this.formatData(userData,
           this.userRequirement.fields);
-        cb(true, formatedData);
+        return cb(true, formatedData);
       } else {
         return cb(false, 'compulsory fields Missing');
       }
@@ -215,13 +218,16 @@
       var userObj = {};
 
       for (var key in fields) {
-        if (userData[fields[key]] === undefined) {
+        if (!userData[fields[key]]) {
           continue;
-        } else if (fields[key] === 'firstname' || fields[key] === 'lastname') {
-          nameObj[fields[key]] = userData[fields[key]];
-        } else {
-          userObj[fields[key]] = userData[fields[key]];
         }
+
+        if (fields[key] === 'firstname' || fields[key] === 'lastname') {
+          nameObj[fields[key]] = userData[fields[key]];
+          continue;
+        }
+
+        userObj[fields[key]] = userData[fields[key]];
       }
 
       return this.mergeData(nameObj, userObj);
@@ -229,12 +235,11 @@
 
     /**
      * mergeData - Merges firstname and lastname into name object
-     * @param  Object mergeObj [The first and last name object]
+     * @param  {Object} mergeObj [The first and last name object]
      * @param  {Object} realObj  [Object to merge into]
      * @return {Object}          [return the realObj]
      */
     mergeData: function(mergeObj, realObj) {
-
       if (Object.keys(mergeObj).length > 0) {
         realObj.name = mergeObj;
         return realObj;
@@ -244,16 +249,16 @@
     },
 
     /**
-     * vierifyRole - Verify if a given role is valid
+     * verifyRole - Verify if a given role is valid
      * @param  {Object}   validatedData [A user valid data]
      * @param  {Function} cb            [Passes result to callback]
      */
-    vierifyRole: function(validatedData, cb) {
-      if (validatedData.access !== undefined) {
-        this.checkRole(validatedData, cb);
-      } else {
-        cb(true, validatedData);
+    verifyRole: function(validatedData, cb) {
+      if (validatedData.access) {
+        return this.checkRole(validatedData, cb);
       }
+
+      return cb(true, validatedData);
     },
 
     /**
@@ -283,7 +288,7 @@
       roleService.getRoles({ $or: query }, function(bool, data) {
         if (bool && data.length === rolesArray.length) {
           userData.access = rolesArray;
-          cb(true, userData);
+          return cb(true, userData);
         } else {
           return cb(false, 'One or more roles does not exist');
         }
@@ -296,13 +301,13 @@
      * @param  {Function} cb       [Passes result to callback]
      */
     validateRoles: function(roleData, cb) {
-
       if (roleData.role !== undefined && roleData.role.isSentence()) {
         var validateRoles = roleData;
-        cb(true, validateRoles);
+        return cb(true, validateRoles);
       } else {
-        cb(false, 'Invalid Role data');
+        return cb(false, 'Invalid Role data');
       }
     }
   };
+
 }());

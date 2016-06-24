@@ -19,10 +19,9 @@
      * and a formated user data if valid else it return a string
      */
     signUp: function(req, res) {
-      helper.validatAndFormatData(req.body, true,
+      helper.validateAndFormatData(req.body, true,
         function(bool, formatedUserData) {
           var errorMessage = 'compulsory fields Missing';
-
           helper.saveDataHandler(res, bool, formatedUserData,
             userHelper.saveUser, errorMessage);
         });
@@ -54,10 +53,10 @@
      */
     login: function(req, res) {
       var userData = {};
-      if (req.body.username !== undefined && req.body.password !== undefined) {
-        userData.username = req.body.username;
-        userData.password = req.body.password;
+      userData.username = req.body.username;
+      userData.password = req.body.password;
 
+      if (userData.username && userData.password) {
         userHelper.validateAndCheckUser(res, userData);
       } else {
         var result = { failed: 'Invalid User Data.' };
@@ -74,7 +73,7 @@
      * user data is true else it return flase]
      */
     editUser: function(req, res) {
-      helper.validatAndFormatData(req.body, false,
+      helper.validateAndFormatData(req.body, false,
         function(bool, formatedUserData) {
           if (bool && typeof(formatedUserData) === 'object') {
             userHelper.updateUserData(res, formatedUserData, req.params.id);
@@ -131,10 +130,14 @@
      * @return Mixed     [Boolean and an Object/String of the result]
      */
     getAllUsers: function(req, res) {
-      var searchQuery = {};
-
-      helper.getData(res, searchQuery, userService.findUsers, 'user');
+      helper.getData(res, {}, userService.findUsers, 'user');
     },
+
+    /**
+     * logout - Log the user out of the application
+     * @param  {Object} res [The request object]
+     * @param  {Object} req [The response Object]
+     */
     logout: function(res, req) {
       var message = { failed: 'You have logged out successfully!!!' };
 

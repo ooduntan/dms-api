@@ -26,7 +26,7 @@
       var result = {};
 
       for (var key in query) {
-        if (searchBy[key] !== undefined) {
+        if (searchBy[key]) {
           result[searchBy[key]] = this.makeSearchQuery(query[key], key);
         }
       }
@@ -43,11 +43,17 @@
     makeSearchQuery: function(value, key) {
       if (key === 'date' || key === 'edit') {
         return { $gt: new Date(value), $lt: new Date(value).addDays(1) };
-      } else if (key === 'before') {
+      }
+
+      if (key === 'before') {
         return { $lt: new Date(value) };
-      } else if (key === 'after') {
+      }
+
+      if (key === 'after') {
         return { $gt: new Date(value).addDays(1) };
-      } else if (key === 'q') {
+      }
+
+      if (key === 'q') {
         var searchExp = new RegExp(value, 'i');
         return [
           { 'title': searchExp },
@@ -82,9 +88,9 @@
      * @return {Function}             [Return a callback function]
      */
     validateDocData: function(docData, allfields, cb) {
-      if (helper.validateData(helper.requiredDoc.reqiure, docData, allfields)) {
+      if (helper.validateData(helper.requiredDoc.require, docData, allfields)) {
         var validData = helper.formatData(docData, helper.requiredDoc.fields);
-        helper.vierifyRole(validData, cb);
+        helper.verifyRole(validData, cb);
       } else {
         return cb(false, 'invalid data');
       }

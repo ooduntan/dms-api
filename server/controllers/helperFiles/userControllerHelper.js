@@ -26,14 +26,14 @@
 
     /**
      * updateWithUserParams - Upadate the database base on the user parameter
-     * @param  {Object} resposeObj  [The server response object]
+     * @param  {Object} responseObj  [The server response object]
      * @param  {Object} newUserData [The new user data]
      * @param  {Object} query       [The user update parameter]
      */
-    updateWithUserParams: function(resposeObj, newUserData, query) {
-      this.checkExistingData(resposeObj, newUserData, query,
+    updateWithUserParams: function(responseObj, newUserData, query) {
+      this.checkExistingData(responseObj, newUserData, query,
         function(bool, message) {
-          helper.dataResponder(resposeObj, bool, message, 'user', 400);
+          helper.dataResponder(responseObj, bool, message, 'user', 400);
         });
     },
 
@@ -61,11 +61,11 @@
      * @param  {Int}   userId      [User ID]
      * @param  {Function} cb          [Passes data through callback]
      */
-    checkExistingData: function(resposeObj, newUserData, userId, cb) {
+    checkExistingData: function(responseObj, newUserData, userId, cb) {
       var _this = this;
 
-      if (newUserData.role !== undefined) {
-        this.getRoleId(resposeObj, newUserData.role, function(roleId) {
+      if (newUserData.role) {
+        this.getRoleId(responseObj, newUserData.role, function(roleId) {
           newUserData.role = roleId;
           _this.updateData(newUserData, userId, cb);
         });
@@ -81,7 +81,7 @@
      * @param  {Function} cb          [Passes result through callback]
      */
     updateData: function(newUserData, userId, cb) {
-      if (newUserData.password !== undefined) {
+      if (newUserData.password) {
         userService.encryptAndUpdateData(newUserData, userId, cb);
       } else {
         userService.findAndUpdateOneUser(newUserData, userId, cb);
@@ -95,7 +95,10 @@
      */
     saveUserData: function(responseObject, userData) {
       userService.saveUser(userData, function(bool, message) {
-        var result = { success: message, failed: message };
+        var result = {
+          success: 'User ' + userData.username + 'created!!!',
+          failed: message
+        };
 
         helper.messageResponder(responseObject, bool, result, 401);
       });
@@ -175,7 +178,8 @@
      */
     validateAndCheckUser: function(respondObj, userData) {
       var _this = this;
-      helper.validatAndFormatData(userData, false,
+
+      helper.validateAndFormatData(userData, false,
         function(bool, cleanUserData) {
           if (bool && typeof(cleanUserData) === 'object') {
             _this.verifyUser(respondObj, cleanUserData);
@@ -185,26 +189,25 @@
             helper.messageResponder(respondObj, false, message, 400);
           }
         });
-
     },
 
     /**
      * updateUserData - Update user data
-     * @param  {Object} resposeObj  [The server response Object]
+     * @param  {Object} responseObj  [The server response Object]
      * @param  {Object} newUserData [The new user data]
      * @param  {Int} userId      [User ID]
      */
-    updateUserData: function(resposeObj, newUserData, userId) {
+    updateUserData: function(responseObj, newUserData, userId) {
       var isNumber = userId.isNumber();
       var isUser = userId.isUserName();
       if (isNumber || isUser) {
         var query = isNumber || isUser ? { _id: userId } : { username: userId };
 
-        privateFunctions.updateWithUserParams(resposeObj, newUserData, query);
+        privateFunctions.updateWithUserParams(responseObj, newUserData, query);
       } else {
         var message = { failed: 'Invalild put request params' };
 
-        helper.messageResponder(resposeObj, false, message, 402);
+        helper.messageResponder(responseObj, false, message, 402);
       }
     }
   };
